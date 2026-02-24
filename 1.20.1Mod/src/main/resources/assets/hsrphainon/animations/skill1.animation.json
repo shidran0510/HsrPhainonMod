@@ -1,0 +1,32 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"skill1": {
+			"animation_length": 4.5833,
+			"bones": {
+				"dawnmaker2": {
+					"rotation": {
+						"0.0": {
+							"pre": [0, 0, 0],
+							"post": [0, -180, 120]
+						},
+						"3.8333": {
+							"vector": [0, -180, 0],
+							"easing": "easeInExpo"
+						}
+					},
+					"position": {
+						"0.0": {
+							"pre": [0, 0, 0],
+							"post": [-9, -2, -5]
+						}
+					},
+					"scale": {
+						"vector": [10, 10, 10]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

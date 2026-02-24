@@ -1,0 +1,36 @@
+{
+  "ultimate": {
+    "category": "player",
+    "sounds": [
+      "hsrphainon:ultimate"
+    ]
+},
+
+  "skill1": {
+    "category": "player",
+    "sounds": [
+      "hsrphainon:skill1"
+    ]
+},
+
+  "skill2": {
+    "category": "player",
+    "sounds": [
+      "hsrphainon:skill2"
+      ]
+},
+
+  "lastattack": {
+    "category": "player",
+    "sounds": [
+      "hsrphainon:lastattack"
+    ]
+},
+
+  "basicattack": {
+    "category": "player",
+    "sounds": [
+      "hsrphainon:basicattack"
+    ]
+  }
+}
