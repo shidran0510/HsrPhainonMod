@@ -25,6 +25,7 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
+import static com.shidran.hsrphainon.item.LogicDawnmaker.Action.*;
 
 public class ItemDawnmaker extends SwordItem implements GeoItem {
 
@@ -113,7 +114,7 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
                     120
                     );
 
-            LogicDawnmaker.LogicSkill1(stack, player);
+            LogicDawnmaker.LogicSkill1(player);
 
             tag.putInt(LockTimer, 100);
         }
@@ -135,7 +136,7 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
                     120
             );
 
-            LogicDawnmaker.LogicSkill2(stack, player);
+            LogicDawnmaker.LogicSkill2(player);
 
             tag.putInt(LockTimer, 100);
         }
@@ -145,6 +146,7 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
 
         CompoundTag tag = stack.getOrCreateTag();
         Level world = player.level();
+
         if (!world.isClientSide) {
             LogicDawnmaker.EffectSkill(
                     player,
@@ -154,7 +156,8 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
                     "basicattack",
                     60
             );
-            LogicDawnmaker.LogicBasicATK(stack, player);
+            LogicDawnmaker.LogicBasicATK(player,1);
+            LogicDawnmaker.Action.Delay(stack, 40, BasicAttack2);
 
             tag.putInt(LockTimer, 60);
         }

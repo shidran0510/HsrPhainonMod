@@ -17,6 +17,8 @@ public class HsrPhainonConstants {
     public static final String EffectTImer = "EffectTimer";
     public static final String LastAttackTimer = "LastAttackTimer";
     public static final String ModelTimer = "ModelTimer";
+    public static final String DelayTimer = "DelayTimer";
+    public static final String ActionName = "ActionName";
 //キー番号
     public static final int BasicATK = 0;
     public static final int Skill1 = 1;

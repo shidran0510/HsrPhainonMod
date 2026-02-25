@@ -47,6 +47,36 @@ public class LogicDawnmaker {
         player.hurtMarked = false;
     }
 
+    public enum Action {
+        None("None", (player, stack) -> {}),
+
+        BasicAttack2("BasicAttack2", (player, stack) -> {
+            LogicDawnmaker.LogicBasicATK(player, 2);
+        }),
+
+        LastAttack("LastAttack", (player, stack) -> {
+            player.level().explode(null, player.getX(), player.getY(), player.getZ(), 2.0F, false, Level.ExplosionInteraction.NONE);
+        });
+
+        private final String id;
+        private final java.util.function.BiConsumer<Player, ItemStack> action;
+
+        Action(String actionId, java.util.function.BiConsumer<Player, ItemStack> actionLogic) {
+            this.id = actionId;
+            this.action = actionLogic;
+        }
+
+        public void execute(Player player, ItemStack stack) {
+            this.action.accept(player, stack);
+        }
+
+        public static void Delay(ItemStack stack, int ticks, Action action) {
+            CompoundTag tag = stack.getOrCreateTag();
+            tag.putInt(DelayTimer, ticks);
+            tag.putString(ActionName, action.name());
+        }
+    }
+
     public static void RunTimer(ItemStack stack, Level world, Entity entity, int slot, boolean isSelected) {
         if (world.isClientSide || !(entity instanceof Player player)) return;
         CompoundTag tag = stack.getTag();
@@ -100,12 +130,32 @@ public class LogicDawnmaker {
                 }
 
                 tag.remove(ModelTimer);
+
             }
         }
 
+        if (tag.contains(DelayTimer)) {
+            int Skill2Timer = tag.getInt(DelayTimer);
+
+            if (Skill2Timer > 0) {
+                tag.putInt(DelayTimer, Skill2Timer - 1);
+            } else {
+                String actionName = tag.getString(ActionName);
+                try {
+                    // 文字列からEnumを取得して実行！
+                    Action action = Action.valueOf(actionName);
+                    action.execute(player, stack);
+                } catch (IllegalArgumentException e) {
+
+                }
+
+                tag.remove(DelayTimer);
+                tag.remove(ActionName);
+            }
+        }
     }
 
-    public static void LogicSkill1(ItemStack stack, Player player) {
+    public static void LogicSkill1(Player player) {
         Level world = player.level();
 
         float yRot = player.getYRot();
@@ -126,7 +176,7 @@ public class LogicDawnmaker {
 
     }
 
-    public static void LogicSkill2(ItemStack stack, Player player) {
+    public static void LogicSkill2(Player player) {
         Level world = player.level();
         int amount = Skill2MeteorAmount; // 出したい数
         float yRot = player.getYRot();
@@ -170,33 +220,61 @@ public class LogicDawnmaker {
 
     }
 
-    public static void LogicBasicATK(ItemStack stack, Player player) {
-        Level world = player.level();
+    public static void LogicBasicATK(Player player,int combo) {
         int range = 1;
+        Level world = player.level();
+        if (combo == 1) {
 
-        // 1. プレイヤーの視線方向（ベクトル）を取得
-        Vec3 lookVec = player.getLookAngle();
+            Vec3 lookVec = player.getLookAngle();
+            Vec3 center = player.getEyePosition().add(lookVec.scale(2.0));
 
-        // 2. 正面2ブロック先の中心座標を計算
-        // プレイヤーの目の位置 (getEyePosition) から視線方向に2.0倍した位置
-        Vec3 center = player.getEyePosition().add(lookVec.scale(2.0));
+            net.minecraft.world.phys.AABB hitBox = new net.minecraft.world.phys.AABB(
+                    center.x - range, center.y - range, center.z - range,
+                    center.x + range, center.y + range, center.z + range
+            );
 
-        // 3. 中心座標から指定したレンジ（半径）のAABB（当たり判定箱）を作成
-        net.minecraft.world.phys.AABB hitBox = new net.minecraft.world.phys.AABB(
-                center.x - range, center.y - range, center.z - range,
-                center.x + range, center.y + range, center.z + range
-        );
+            world.getEntities(player, hitBox, entity -> entity instanceof net.minecraft.world.entity.LivingEntity).forEach(entity -> {
+                if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
 
-        // 4. 範囲内のエンティティ（自分以外）を取得して処理
-        world.getEntities(player, hitBox, entity -> entity instanceof net.minecraft.world.entity.LivingEntity).forEach(entity -> {
-            if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
-                // ダメージを与える
-                livingEntity.hurt(player.damageSources().playerAttack(player), BasicDamage);
+                    livingEntity.hurt(player.damageSources().playerAttack(player), BasicDamage);
+                    livingEntity.knockback(0.5, -lookVec.x, -lookVec.z);
+                }
+            });
+        }
+        if (combo == 2) {
+            // 1. 判定のパラメータ設定
+            double radius = 4.5;    // 攻撃の届く距離（半径）
+            double angle = 60.0;    // 扇状の広さ（左右30度ずつ、計60度）
+            Vec3 center = player.position();
+            Vec3 lookVec = player.getLookAngle().normalize(); // プレイヤーの向いている方向
 
-                // 必要であればノックバックなどの追加効果
-                livingEntity.knockback(0.5, -lookVec.x, -lookVec.z);
-            }
-        });
+            // 2. まずは大きめの立方体(AABB)で周囲のエンティティをざっくり取得
+            net.minecraft.world.phys.AABB area = player.getBoundingBox().inflate(radius, 2.0, radius);
+
+            world.getEntities(player, area, entity -> entity instanceof net.minecraft.world.entity.LivingEntity)
+                    .forEach(entity -> {
+                        if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
+                            // 3. プレイヤーから敵への方向ベクトルを計算
+                            Vec3 toTarget = livingEntity.position().subtract(center).normalize();
+
+                            // 4. ベクトルの内積を使って、射程内かつ扇状の範囲内にいるか判定
+                            double dotProduct = lookVec.dot(toTarget); // 2つのベクトルの重なり具合（1.0で完全一致）
+                            double cosAngle = Math.cos(Math.toRadians(angle)); // 判定のしきい値
+
+                            // 距離チェック ＆ 角度チェック（内積 > cos(角度) で範囲内）
+                            if (player.distanceTo(livingEntity) <= radius && dotProduct > cosAngle) {
+
+                                // 攻撃処理
+                                livingEntity.hurt(player.damageSources().playerAttack(player), BasicDamage * 1.5f);
+
+                                // ノックバック（プレイヤーから遠ざける方向）
+                                double dX = livingEntity.getX() - player.getX();
+                                double dZ = livingEntity.getZ() - player.getZ();
+                                livingEntity.knockback(0.8, dX, dZ); // 拡散するように外側へ飛ばす
+                            }
+                        }
+                    });
+        }
     }
 
     @Mod.EventBusSubscriber(modid = HsrPhainon.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
