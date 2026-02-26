@@ -74,8 +74,9 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
                         240
                 );
 
-                tag.putInt(ModelTimer,100);
-                tag.putInt(LastAttackTimer,80);
+
+                Delay(stack,80,LastAttack);
+                tag.putInt(ModelTimer,28);
                 tag.putInt(LockTimer, 120);
             } else {
                 name = "カスライナ";
@@ -88,11 +89,11 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
                         "transform",
                         160
                 );
-
+                
+                tag.putBoolean("ShowWeapon", true);
+                Delay(stack,12,TransFormEffect);
                 tag.putInt(ModelTimer,28);
                 tag.putInt(LockTimer, 120);
-                tag.putBoolean("ShowWeapon", true);
-                tag.putInt(EffectTImer, 12);
             }
             player.displayClientMessage(Component.literal(name), true);
         }
@@ -158,6 +159,7 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
             );
             LogicDawnmaker.LogicBasicATK(player,1);
             LogicDawnmaker.Action.Delay(stack, 40, BasicAttack2);
+            tag.putBoolean("ShowWeapon", true);
 
             tag.putInt(LockTimer, 60);
         }

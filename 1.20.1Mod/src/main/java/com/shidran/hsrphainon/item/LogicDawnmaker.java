@@ -50,12 +50,17 @@ public class LogicDawnmaker {
     public enum Action {
         None("None", (player, stack) -> {}),
 
-        BasicAttack2("BasicAttack2", (player, stack) -> {
+        BasicAttack2("BasicAttack2", (player,stack) -> {
             LogicDawnmaker.LogicBasicATK(player, 2);
         }),
 
-        LastAttack("LastAttack", (player, stack) -> {
-            player.level().explode(null, player.getX(), player.getY(), player.getZ(), 2.0F, false, Level.ExplosionInteraction.NONE);
+        LastAttack("LastAttack", (player,stack) -> {
+            player.level().explode(player, player.getX(), player.getY(), player.getZ(),
+                    LastAttackDamage, false, explosionType);
+        }),
+
+        TransFormEffect("TransFormEffect", (player,stack) -> {
+            EffectRenderer.startTransformationEffect();
         });
 
         private final String id;
@@ -94,29 +99,6 @@ public class LogicDawnmaker {
             }
         }
 
-        if (tag.contains(EffectTImer)) {
-            int EffectTimer = tag.getInt(EffectTImer);
-
-            if (EffectTimer > 0) {
-                tag.putInt(EffectTImer, EffectTimer - 1);
-            } else {
-                EffectRenderer.startTransformationEffect();
-                tag.remove(EffectTImer);
-            }
-        }
-
-        if (tag.contains(LastAttackTimer)) {
-            int Skill2Timer = tag.getInt(LastAttackTimer);
-
-            if (Skill2Timer > 0) {
-                tag.putInt(LastAttackTimer, Skill2Timer - 1);
-            } else {
-                world.explode(player, player.getX(), player.getY(), player.getZ(),
-                        LastAttackDamage, false, explosionType);
-                tag.remove(LastAttackTimer);
-            }
-        }
-
         if (tag.contains(ModelTimer)) {
             int Skill2Timer = tag.getInt(ModelTimer);
 
@@ -128,7 +110,6 @@ public class LogicDawnmaker {
                 } else {
                     tag.putInt("CustomModelData", 0); // ファイノンのモデルへ
                 }
-
                 tag.remove(ModelTimer);
 
             }
@@ -292,9 +273,7 @@ public class LogicDawnmaker {
             boolean hasSword = hasDawnmakerInInventory(player);
 
             if (!hasSword && player.isNoGravity()) {
-                player.setNoGravity(false);
-                player.setInvulnerable(false);
-                player.hurtMarked = false;
+                LogicDawnmaker.StopPlayerLock(player);
             }
         }
 

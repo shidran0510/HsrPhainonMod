@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import static com.shidran.hsrphainon.item.ItemDawnmaker.BaseAttackDmageUUID;
