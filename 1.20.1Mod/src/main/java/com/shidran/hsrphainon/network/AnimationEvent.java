@@ -9,8 +9,9 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
-
 import java.util.UUID;
+
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 public class AnimationEvent {
     public static void handlePacket(UUID playerId, String animationId) {
@@ -21,11 +22,11 @@ public class AnimationEvent {
         if (player instanceof AbstractClientPlayer clientPlayer) {
             // 1. AssociatedData から登録したレイヤーを取得
             var data = PlayerAnimationAccess.getPlayerAssociatedData(clientPlayer);
-            var layer = data.get(ResourceLocation.fromNamespaceAndPath("hsrphainon", animationId));
+            var layer = data.get(ResourceLocation.fromNamespaceAndPath(MOD_ID, animationId));
 
             if (layer instanceof ModifierLayer<?> modifierLayer) {
                 // 2. アニメーションをレジストリから取得
-                var anim = PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("hsrphainon", animationId));
+                var anim = PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath(MOD_ID, animationId));
 
                 if (anim != null) {
                     // 3. 再生

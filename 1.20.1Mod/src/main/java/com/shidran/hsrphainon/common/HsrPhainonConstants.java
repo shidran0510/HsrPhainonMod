@@ -2,10 +2,13 @@ package com.shidran.hsrphainon.common;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import static com.shidran.hsrphainon.item.ItemDawnmaker.BaseAttackDmageUUID;
@@ -13,18 +16,22 @@ import static com.shidran.hsrphainon.item.ItemDawnmaker.BaseAttackSpeedUUID;
 
 //import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 public class HsrPhainonConstants {
-//タイマー
+//文字定義
+    public static final String MOD_ID = "hsrphainon";
     public static final String LockTimer = "LockTimer";
-    public static final String EffectTImer = "EffectTimer";
-    public static final String LastAttackTimer = "LastAttackTimer";
     public static final String ModelTimer = "ModelTimer";
     public static final String DelayTimer = "DelayTimer";
     public static final String ActionName = "ActionName";
-//キー番号
-    public static final int BasicATK = 0;
-    public static final int Skill1 = 1;
-    public static final int Skill2 = 2;
-    public static final int Ultimate = 3;
+    public static final String CustomModelData = "CustomModelData";
+    public static final String Mode = "mode";
+    public static final String ShowDawnmaker = "showDawnmaker";
+    public static final String[] animID = {"transform", "skill1", "skill2", "lastattack", "basicattack"};
+//共通変数定義
+    public static Level world(Player player) { return player.level(); }
+    public static CompoundTag tag(Player player) { return player.getMainHandItem().getOrCreateTag(); }
+    public static CompoundTag tag(ItemStack stack) {return stack.getTag(); }
+    public static ItemStack stack(Player player) { return player.getMainHandItem(); }
+    public static Item item(Player player) {return player.getMainHandItem().getItem();}
 //スキル設定
     public static final float BasicDamage = 30.0F;
     public static final float Skill1Damage = 50.0F; //スキル1のダメージ
@@ -34,6 +41,11 @@ public class HsrPhainonConstants {
     public static final float Skill2DamageMax = 20.0F; //隕石最大爆発ダメージ
     public static final float LastAttackDamage = 20.0F;//必殺技終了時の爆発ダメージ
     public static final Level.ExplosionInteraction explosionType = Level.ExplosionInteraction.NONE;
+//キー番号
+    public static final int BasicATK = 0;
+    public static final int Skill1 = 1;
+    public static final int Skill2 = 2;
+    public static final int Ultimate = 3;
 //ダメージ
     public static final double KhaslanaDamage = 24.0D;
     public static final double PhainonDamage = 12.0D;

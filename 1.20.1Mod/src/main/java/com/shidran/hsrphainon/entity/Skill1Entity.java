@@ -10,12 +10,12 @@ import net.minecraft.world.phys.AABB;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
-import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 import java.util.List;
+
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.LockTimer;
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.Skill1Damage;
 
 public class Skill1Entity extends Entity implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -27,7 +27,6 @@ public class Skill1Entity extends Entity implements GeoEntity {
 
     @Override
     public boolean shouldRenderAtSqrDistance(double distance) {
-
         double d0 = 64.0 * 64.0;
         return distance < d0 * 4.0;
     }
@@ -53,6 +52,16 @@ public class Skill1Entity extends Entity implements GeoEntity {
     @Override
     public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getAddEntityPacket() {
         return net.minecraftforge.network.NetworkHooks.getEntitySpawningPacket(this);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
     }
 
     private Player owner;
@@ -112,7 +121,7 @@ public class Skill1Entity extends Entity implements GeoEntity {
                 net.minecraft.world.item.ItemStack stack = owner.getMainHandItem();
 
                 if (stack.getItem() instanceof com.shidran.hsrphainon.item.ItemDawnmaker) {
-                    int lockTimer = stack.getOrCreateTag().getInt("LockTimer");
+                    int lockTimer = stack.getOrCreateTag().getInt(LockTimer);
                     if (lockTimer <= 0) {
                         this.discard();
                         this.shouldExpire = true;
@@ -123,17 +132,5 @@ public class Skill1Entity extends Entity implements GeoEntity {
             }
         }
         super.tick();
-    }
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, event -> {
-            return event.setAndContinue(RawAnimation.begin().thenPlay("slash_up"));
-        }));
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
     }
 }

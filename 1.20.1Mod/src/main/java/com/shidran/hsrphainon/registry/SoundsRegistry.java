@@ -1,15 +1,15 @@
 package com.shidran.hsrphainon.registry;
 
-import com.shidran.hsrphainon.HsrPhainon;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.MOD_ID;
 
 public class SoundsRegistry {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
-            DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, HsrPhainon.MOD_ID);
+            DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MOD_ID);
 
     public static final RegistryObject<SoundEvent> UltimateSE =
             SOUND_EVENTS.register(

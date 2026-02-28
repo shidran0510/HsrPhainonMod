@@ -1,18 +1,15 @@
 {
 	"format_version": "1.21.11",
+	"gui_light": "front",
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "hsrphainon:item/dawnmaker"
 	},
 	"overrides": [
-		{
-			"predicate": {
-				"custom_model_data": 1
-			},
-			"model": "hsrphainon:item/dawnmaker2"
-		}
-		],
-		"elements": [
+		{ "predicate": { "custom_model_data": 1 }, "model": "hsrphainon:item/dawnmaker2"},
+		{ "predicate": { "custom_model_data": 33550336 }, "model": "hsrphainon:item/none"}
+	],
+	"elements": [
 		{
 			"name": "dawnmaker_0",
 			"from": [8.20183, 0.09025, 8],
@@ -5069,7 +5066,7 @@
 		"gui": {
 			"rotation": [0, 0, 45],
 			"translation": [-1.75, 1.25, 0],
-			"scale": [1.6, 1.6, 1.6]
+			"scale": [1.6, 1.6, 4]
 		},
 		"head": {
 			"scale": [0, 0, 0]

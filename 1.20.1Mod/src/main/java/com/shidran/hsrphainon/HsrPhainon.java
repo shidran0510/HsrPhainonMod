@@ -15,7 +15,7 @@ import software.bernie.geckolib.GeckoLib;
 
 public class HsrPhainon {
 
-    public static final String MOD_ID = "hsrphainon";
+
 
     @SuppressWarnings("removal")
     public HsrPhainon(){

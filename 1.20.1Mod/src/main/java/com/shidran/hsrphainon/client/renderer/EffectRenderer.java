@@ -12,9 +12,9 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import com.shidran.hsrphainon.HsrPhainon;
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
-@Mod.EventBusSubscriber(modid = HsrPhainon.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
 public class EffectRenderer {
     // エフェクトの残り時間を管理する変数（0〜200）
     private static int effectTimer = 0;

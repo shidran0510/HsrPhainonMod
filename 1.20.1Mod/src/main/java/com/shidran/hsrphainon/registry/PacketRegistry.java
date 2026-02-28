@@ -1,12 +1,13 @@
 package com.shidran.hsrphainon.registry;
 
-import com.shidran.hsrphainon.HsrPhainon;
 import com.shidran.hsrphainon.network.AnimationPacket;
 import com.shidran.hsrphainon.network.ExecutePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
+
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.MOD_ID;
 
 public class PacketRegistry {
     private static SimpleChannel INSTANCE;
@@ -16,7 +17,7 @@ public class PacketRegistry {
 
     public static void register() {
         INSTANCE = NetworkRegistry.ChannelBuilder
-                .named(ResourceLocation.fromNamespaceAndPath(HsrPhainon.MOD_ID, "messages"))
+                .named(ResourceLocation.fromNamespaceAndPath(MOD_ID, "messages"))
                 .networkProtocolVersion(() -> "1.0")
                 .clientAcceptedVersions(s -> true)
                 .serverAcceptedVersions(s -> true)

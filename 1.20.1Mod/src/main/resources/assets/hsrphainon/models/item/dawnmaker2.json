@@ -1,6 +1,6 @@
 {
 	"format_version": "1.21.11",
-	"parent": "builtin/entity",
+	"gui_light": "front",
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "hsrphainon:item/dawnmaker2"

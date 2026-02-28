@@ -2,7 +2,6 @@ package com.shidran.hsrphainon.registry;
 
 import com.shidran.hsrphainon.client.renderer.Skill1Renderer;
 import com.shidran.hsrphainon.client.renderer.Skill2Renderer;
-import com.shidran.hsrphainon.HsrPhainon;
 import com.shidran.hsrphainon.entity.Skill1Entity;
 import com.shidran.hsrphainon.entity.Skill2Entity;
 import net.minecraft.world.entity.EntityType;
@@ -15,10 +14,12 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-@Mod.EventBusSubscriber(modid = HsrPhainon.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.MOD_ID;
+
+@Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EntityRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITIES =
-            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, HsrPhainon.MOD_ID);
+            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MOD_ID);
     //剣エンティティ
     public static final RegistryObject<EntityType<Skill1Entity>> SKILL1_ENTITY =
             ENTITIES.register("skill1_entity", () -> EntityType.Builder.of(Skill1Entity::new, MobCategory.MISC)

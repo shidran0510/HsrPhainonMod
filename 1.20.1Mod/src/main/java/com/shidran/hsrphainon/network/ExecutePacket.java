@@ -1,12 +1,13 @@
 package com.shidran.hsrphainon.network;
 
 import com.shidran.hsrphainon.item.ItemDawnmaker;
-import com.shidran.hsrphainon.registry.PacketRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
+
 import java.util.function.Supplier;
+
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 public class ExecutePacket {
@@ -47,6 +48,7 @@ public class ExecutePacket {
                         case Ultimate:
                             dawnmaker.Ultimate(stack, player);
                             break;
+                        default:
             }
         }
         context.setPacketHandled(true);

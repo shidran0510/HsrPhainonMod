@@ -1,6 +1,5 @@
 package com.shidran.hsrphainon.item;
 
-import com.shidran.hsrphainon.HsrPhainon;
 import com.shidran.hsrphainon.client.renderer.EffectRenderer;
 import com.shidran.hsrphainon.entity.Skill1Entity;
 import com.shidran.hsrphainon.entity.Skill2Entity;
@@ -17,21 +16,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 public class LogicDawnmaker {
-    public static void EffectSkill(Player player, Item item, String message, net.minecraft.sounds.SoundEvent sound, String animation, int cooldown) {
-        Level world = player.level();
+    public static void EffectSkill(Player player, String message, net.minecraft.sounds.SoundEvent sound, String animation, int cooldown, int tick, boolean show) {
+        Level world = world(player);
+        CompoundTag tag = tag(player);
+        Item item = item(player);
 
         player.sendSystemMessage(Component.literal(message)); //必殺技・発動
         world.playSound(null, player, sound, SoundSource.PLAYERS, 1.0F, 1.0F);
         PacketRegistry.sendToAllClients(new AnimationPacket(player.getUUID(), animation));
         player.getCooldowns().addCooldown(item, cooldown);
         player.fallDistance = 0;
+        tag.putBoolean(ShowDawnmaker, show);
+        tag.putInt(ModelTimer, tick);
+        tag.putInt(LockTimer, tick);
     }
 
     public static void RunPlayerLock(Player player) {
@@ -50,24 +54,16 @@ public class LogicDawnmaker {
     public enum Action {
         None("None", (player, stack) -> {}),
 
-        BasicAttack2("BasicAttack2", (player,stack) -> {
-            LogicDawnmaker.LogicBasicATK(player, 2);
-        }),
+        BasicAttack2("BasicAttack2", (player,stack) -> LogicDawnmaker.LogicBasicATK(player, 2)),
 
-        LastAttack("LastAttack", (player,stack) -> {
-            player.level().explode(player, player.getX(), player.getY(), player.getZ(),
-                    LastAttackDamage, false, explosionType);
-        }),
+        LastAttack("LastAttack", (player,stack) -> player.level().explode(player, player.getX(), player.getY(), player.getZ(),
+                LastAttackDamage, false, explosionType)),
 
-        TransFormEffect("TransFormEffect", (player,stack) -> {
-            EffectRenderer.startTransformationEffect();
-        });
+        TransFormEffect("TransFormEffect", (player,stack) -> EffectRenderer.startTransformationEffect());
 
-        private final String id;
         private final java.util.function.BiConsumer<Player, ItemStack> action;
 
         Action(String actionId, java.util.function.BiConsumer<Player, ItemStack> actionLogic) {
-            this.id = actionId;
             this.action = actionLogic;
         }
 
@@ -82,48 +78,48 @@ public class LogicDawnmaker {
         }
     }
 
-    public static void RunTimer(ItemStack stack, Level world, Entity entity, int slot, boolean isSelected) {
+    public static void RunTimer(ItemStack stack, Level world, Entity entity) {
         if (world.isClientSide || !(entity instanceof Player player)) return;
         CompoundTag tag = stack.getTag();
 
-        if (tag.contains(LockTimer)) { //ロック中にアイテムを失うと物理状態の変更が永続する
+        if (tag.contains(LockTimer)) {
             int lockTimer = tag.getInt(LockTimer);
+
 
             if (lockTimer > 0) {
                 LogicDawnmaker.RunPlayerLock(player);
                 tag.putInt(LockTimer, lockTimer - 1);
             } else {
-                tag.remove(LockTimer);
-                tag.remove("ShowWeapon");
                 LogicDawnmaker.StopPlayerLock(player);
+                tag.remove(LockTimer);
             }
         }
 
         if (tag.contains(ModelTimer)) {
-            int Skill2Timer = tag.getInt(ModelTimer);
+            int modelTimer = tag.getInt(ModelTimer);
+            if (!tag.getBoolean(ShowDawnmaker)) { tag.putInt(CustomModelData, 33550336); }
 
-            if (Skill2Timer > 0) {
-                tag.putInt(ModelTimer, Skill2Timer - 1);
+            if (modelTimer > 0) {
+                tag.putInt(ModelTimer, modelTimer - 1);
             } else {
-                if (tag.getBoolean("mode")) {
-                    tag.putInt("CustomModelData", 1); // カスライナのモデルへ
+                if (tag.getBoolean(Mode)) {
+                    tag.putInt(CustomModelData, 1); // カスライナのモデルへ
                 } else {
-                    tag.putInt("CustomModelData", 0); // ファイノンのモデルへ
+                    tag.putInt(CustomModelData, 0); // ファイノンのモデルへ
                 }
+                tag.putBoolean(ShowDawnmaker,false);
                 tag.remove(ModelTimer);
-
             }
         }
 
         if (tag.contains(DelayTimer)) {
-            int Skill2Timer = tag.getInt(DelayTimer);
+            int delayTimer = tag.getInt(DelayTimer);
 
-            if (Skill2Timer > 0) {
-                tag.putInt(DelayTimer, Skill2Timer - 1);
+            if (delayTimer > 0) {
+                tag.putInt(DelayTimer, delayTimer - 1);
             } else {
                 String actionName = tag.getString(ActionName);
                 try {
-                    // 文字列からEnumを取得して実行！
                     Action action = Action.valueOf(actionName);
                     action.execute(player, stack);
                 } catch (IllegalArgumentException e) {
@@ -145,9 +141,9 @@ public class LogicDawnmaker {
         double dxSide = (double) (-net.minecraft.util.Mth.cos(f));
         double dzSide = (double) (-net.minecraft.util.Mth.sin(f));
 
-        double sx = player.getX() + dxSide * 2.0;
+        double sx = player.getX() + dxSide * 1.5;
         double sy = player.getY() + 10;
-        double sz = player.getZ() + dzSide * 2.0;
+        double sz = player.getZ() + dzSide * 1.5;
 
         Skill1Entity slash = new Skill1Entity(EntityRegistry.SKILL1_ENTITY.get(), world);
         slash.moveTo(sx, sy, sz, player.getYRot(), 90.0F);
@@ -258,7 +254,7 @@ public class LogicDawnmaker {
         }
     }
 
-    @Mod.EventBusSubscriber(modid = HsrPhainon.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class EventHandler {
 
         @SubscribeEvent
@@ -278,28 +274,26 @@ public class LogicDawnmaker {
         }
 
         @SubscribeEvent
-        public static void onPlayerDeath(LivingDeathEvent event) {
+        public static void onLivingDamage(LivingDamageEvent event) {
             if (!(event.getEntity() instanceof Player player)) return;
 
-            // メインハンドのアイテムを確認
             ItemStack stack = player.getMainHandItem();
-            if (!(stack.getItem() instanceof ItemDawnmaker sword)) return;
+            if (!(stack.getItem() instanceof ItemDawnmaker)) return;
 
             CompoundTag tag = stack.getOrCreateTag();
 
-            // カスライナ形態（mode == true）かチェック
-            if (tag.getBoolean("mode")) {
-                // 1. 死亡イベントをキャンセルして復活させる
+            float damage = event.getAmount();
+
+            if (tag.getBoolean(Mode) && damage >= player.getHealth()) {
                 event.setCanceled(true);
 
-                // 2. 体力と状態のリセット（トーテムのような挙動）
-                player.setHealth(2.0F); // ハート1個分で復活
+                player.setHealth(player.getMaxHealth()); // ハート1個分で復活
                 player.removeAllEffects(); // デバフ解除
-                // 必要に応じて回復や耐性のエフェクトを付与
-                // player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 1));
 
                 if (stack.getItem() instanceof ItemDawnmaker dawnmaker) {
                     dawnmaker.Ultimate(stack, player);
+
+                    tag.putBoolean(Mode, false);
                 }
             }
         }

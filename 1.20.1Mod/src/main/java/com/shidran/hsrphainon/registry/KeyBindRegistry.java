@@ -1,15 +1,15 @@
 package com.shidran.hsrphainon.registry;
 
-import com.shidran.hsrphainon.HsrPhainon;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 import java.awt.event.KeyEvent;
 
-@Mod.EventBusSubscriber(modid = HsrPhainon.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
+
+@Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class KeyBindRegistry {
 
     public static KeyMapping[] hsrphainonKey =  new KeyMapping[4];
