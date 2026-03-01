@@ -16,8 +16,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-import static com.shidran.hsrphainon.common.HsrPhainonConstants.LockTimer;
-import static com.shidran.hsrphainon.common.HsrPhainonConstants.Skill1Damage;
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 public class Skill1Entity extends Entity implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -94,7 +93,7 @@ public class Skill1Entity extends Entity implements GeoEntity {
 
             List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != owner);
             for (LivingEntity target : targets) {
-                target.hurt(this.damageSources().playerAttack(owner), Skill1Damage);
+                target.hurt(this.damageSources().playerAttack(owner), getSkill1Damage());
             }
 
             if (owner != null) {

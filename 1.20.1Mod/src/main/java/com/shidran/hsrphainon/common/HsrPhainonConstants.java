@@ -31,34 +31,38 @@ public class HsrPhainonConstants {
     public static CompoundTag tag(Player player) { return player.getMainHandItem().getOrCreateTag(); }
     public static CompoundTag tag(ItemStack stack) {return stack.getTag(); }
     public static Item item(Player player) {return player.getMainHandItem().getItem();}
-//スキル設定
-    public static final float BasicDamage = 30.0F;
-    public static final float Skill1Damage = 50.0F; //スキル1のダメージ
-    public static final int Skill2MeteorAmount = 30; //隕石の数
-    public static final float Skill2MeteorDensity = 30.0F; //隕石の密度
-    public static final float Skill2DamageMin = 10.0F; //隕石最小爆発ダメージ
-    public static final float Skill2DamageMax = 20.0F; //隕石最大爆発ダメージ
-    public static final float LastAttackDamage = 20.0F;//必殺技終了時の爆発ダメージ
-    public static final Level.ExplosionInteraction explosionType = Level.ExplosionInteraction.NONE;
 //キー番号
     public static final int BasicATK = 0;
     public static final int Skill1 = 1;
     public static final int Skill2 = 2;
     public static final int Ultimate = 3;
-//ダメージ
-    public static final double KhaslanaDamage = 24.0D;
-    public static final double PhainonDamage = 12.0D;
-    public static final Multimap<Attribute, AttributeModifier> PHAINON_MODIFIERS;
-    public static final Multimap<Attribute, AttributeModifier> KHASLANA_MODIFIERS;
-    static {
-        ImmutableMultimap.Builder<Attribute, AttributeModifier> phainonBuilder = ImmutableMultimap.builder();
-        phainonBuilder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BaseAttackDmageUUID, "Weapon modifier", PhainonDamage - 1.0D, AttributeModifier.Operation.ADDITION));
-        phainonBuilder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BaseAttackSpeedUUID, "Weapon modifier", -2.4D, AttributeModifier.Operation.ADDITION));
-        PHAINON_MODIFIERS = phainonBuilder.build();
+//スキルダメージ
+    public static float getBasicATKDamage() { return HsrPhainonConfig.BasicATKDamage.get().floatValue(); }
+    public static float getSkill1Damage() { return HsrPhainonConfig.Skill1Damage.get().floatValue(); }
+    public static float getSkill2DamageMin() { return HsrPhainonConfig.Skill2DamageMin.get().floatValue(); }
+    public static float getSkill2DamageMax() { return HsrPhainonConfig.Skill2DamageMax.get().floatValue(); }
+    public static int getSkill2MeteorAmount() { return HsrPhainonConfig.Skill2MeteorAmount.get(); }
+    public static float getSkill2MeteorDensity() { return HsrPhainonConfig.Skill2MeteorDensity.get().floatValue(); }
+    public static float getLastAttackDamage() { return HsrPhainonConfig.LastAttackDamage.get().floatValue(); }
+    public static Level.ExplosionInteraction getExplosionType() {return HsrPhainonConfig.ExplosionType.get();}
+// 武器属性 (AttributeModifier)
+    public static Multimap<Attribute, AttributeModifier> PhainonDamage;
+    public static Multimap<Attribute, AttributeModifier> KhaslanaDamage;
 
-        ImmutableMultimap.Builder<Attribute, AttributeModifier> khaslanaBuilder = ImmutableMultimap.builder();
-        khaslanaBuilder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BaseAttackDmageUUID, "Weapon modifier", KhaslanaDamage - 1.0D, AttributeModifier.Operation.ADDITION));
-        khaslanaBuilder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BaseAttackSpeedUUID, "Weapon modifier", -2.4D, AttributeModifier.Operation.ADDITION));
-        KHASLANA_MODIFIERS = khaslanaBuilder.build();
+// MOD起動時に呼び出す初期化メソッド
+public static Multimap<Attribute, AttributeModifier> getPhainonModifiers() {
+    double phainonDmg = HsrPhainonConfig.PhainonDamage.get();
+    ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+    builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BaseAttackDmageUUID, "Weapon modifier", phainonDmg - 1.0D, AttributeModifier.Operation.ADDITION));
+    builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BaseAttackSpeedUUID, "Weapon modifier", -2.4D, AttributeModifier.Operation.ADDITION));
+    return builder.build();
+}
+
+    public static Multimap<Attribute, AttributeModifier> getKhaslanaModifiers() {
+        double khaslanaDmg = HsrPhainonConfig.KhaslanaDamage.get();
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BaseAttackDmageUUID, "Weapon modifier", khaslanaDmg - 1.0D, AttributeModifier.Operation.ADDITION));
+        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BaseAttackSpeedUUID, "Weapon modifier", -2.4D, AttributeModifier.Operation.ADDITION));
+        return builder.build();
     }
 }

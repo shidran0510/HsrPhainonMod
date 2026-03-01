@@ -1,6 +1,7 @@
 package com.shidran.hsrphainon.item;
 
 import com.google.common.collect.Multimap;
+import com.shidran.hsrphainon.common.HsrPhainonConstants;
 import com.shidran.hsrphainon.registry.SoundsRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -165,11 +166,13 @@ public class ItemDawnmaker extends SwordItem {
         return oldStack.getOrCreateTag().getBoolean(Mode) != newStack.getOrCreateTag().getBoolean(Mode);
     }
 
+    @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        if (slot != EquipmentSlot.MAINHAND) {
-            return super.getAttributeModifiers(slot, stack);
+        if (slot == EquipmentSlot.MAINHAND) {
+            return tag(stack).getBoolean(Mode) ?
+                    HsrPhainonConstants.getKhaslanaModifiers() :
+                    HsrPhainonConstants.getPhainonModifiers();
         }
-
-        return getMode(stack) ? KHASLANA_MODIFIERS : PHAINON_MODIFIERS;
+        return super.getAttributeModifiers(slot, stack);
     }
 }

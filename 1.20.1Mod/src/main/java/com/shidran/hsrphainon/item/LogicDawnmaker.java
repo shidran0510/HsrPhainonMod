@@ -59,7 +59,7 @@ public class LogicDawnmaker {
         BasicAttack2((player, stack) -> LogicDawnmaker.LogicBasicATK(player, 2)),
 
         LastAttack((player, stack) -> world(player).explode(player, player.getX(), player.getY(), player.getZ(),
-                LastAttackDamage, false, explosionType)),
+                getLastAttackDamage(), false, getExplosionType())),
 
         TransFormEffect((player, stack) -> EffectRenderer.startTransformationEffect());
 
@@ -163,12 +163,12 @@ public class LogicDawnmaker {
         net.minecraft.world.phys.Vec3 horizontalLook = new net.minecraft.world.phys.Vec3(dx, 0, dz);
         net.minecraft.world.phys.Vec3 sideVec = new net.minecraft.world.phys.Vec3(-dz, 0, dx);
 
-        for (int i = 0; i < Skill2MeteorAmount; i++) {
+        for (int i = 0; i < getSkill2MeteorAmount(); i++) {
             Skill2Entity meteor = new Skill2Entity(EntityRegistry.SKILL2_ENTITY.get(), world);
 
 
-            double randomSide = (world.random.nextDouble() - 0.5) * Skill2MeteorDensity;
-            double randomForward = (world.random.nextDouble() - 0.5) * Skill2MeteorDensity;
+            double randomSide = (world.random.nextDouble() - 0.5) * getSkill2MeteorDensity();
+            double randomForward = (world.random.nextDouble() - 0.5) * getSkill2MeteorDensity();
 
             double forwardOffset = 20.0 + randomForward;
             double heightOffset = 15.0 + (world.random.nextDouble() * 6.0);
@@ -212,7 +212,7 @@ public class LogicDawnmaker {
             world.getEntities(player, hitBox, entity -> entity instanceof net.minecraft.world.entity.LivingEntity).forEach(entity -> {
                 if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
 
-                    livingEntity.hurt(player.damageSources().playerAttack(player), BasicDamage);
+                    livingEntity.hurt(player.damageSources().playerAttack(player), getBasicATKDamage());
                     livingEntity.knockback(0.5, -lookVec.x, -lookVec.z);
                 }
             });
@@ -236,7 +236,7 @@ public class LogicDawnmaker {
 
                             if (player.distanceTo(livingEntity) <= radius && dotProduct > cosAngle) {
 
-                                livingEntity.hurt(player.damageSources().playerAttack(player), BasicDamage * 1.5f);
+                                livingEntity.hurt(player.damageSources().playerAttack(player), getBasicATKDamage() * 1.5f);
 
                                 double dX = livingEntity.getX() - player.getX();
                                 double dZ = livingEntity.getZ() - player.getZ();
