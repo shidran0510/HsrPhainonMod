@@ -7,11 +7,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.LockTimer;
@@ -36,20 +38,20 @@ public class Skill1Entity extends Entity implements GeoEntity {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    protected void addAdditionalSaveData(@Nonnull CompoundTag tag) {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    protected void readAdditionalSaveData(@Nonnull CompoundTag tag) {
     }
 
-    @Override
+    @Override @Nonnull
     public net.minecraft.world.phys.AABB getBoundingBoxForCulling() {
 
         return this.getBoundingBox().inflate(30.0D);
     }
 
-    @Override
+    @Override @Nonnull
     public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getAddEntityPacket() {
         return net.minecraftforge.network.NetworkHooks.getEntitySpawningPacket(this);
     }
@@ -70,9 +72,7 @@ public class Skill1Entity extends Entity implements GeoEntity {
         this.owner = player;
     }
 
-    private boolean shouldExpire = false;
-
-    private static final float START_PITCH = 90.0F; //出現時
+    private static final float START_PITCH = 90.0F; //出現時の角度
     private static final float END_PITCH = 0.0F; //目標ピッチ角
     private static final int ROTATION_DURATION = 100; //何秒かけて回転させるか
 
@@ -90,25 +90,7 @@ public class Skill1Entity extends Entity implements GeoEntity {
 
         if (!this.level().isClientSide) {
 
-            net.minecraft.world.phys.Vec3 lookVec = this.getLookAngle();
-
-            double maxReach = 21.0;
-            double currentReach = maxReach * Math.min(1.0, (double)this.tickCount / 20); // 20ticksで最大
-            double midDist = currentReach * 0.5;
-
-            double hitCenterX = this.getX() + (lookVec.x * midDist);
-            double hitCenterY = this.getY() + (lookVec.y * midDist);
-            double hitCenterZ = this.getZ() + (lookVec.z * midDist);
-
-            float thickness = 0.5F;
-            double growX = Math.abs(lookVec.x) * midDist + thickness;
-            double growY = Math.abs(lookVec.y) * midDist + thickness;
-            double growZ = Math.abs(lookVec.z) * midDist + thickness;
-
-            AABB hitBox = new AABB(
-                    hitCenterX - growX, hitCenterY - growY, hitCenterZ - growZ,
-                    hitCenterX + growX, hitCenterY + growY, hitCenterZ + growZ
-            );
+            AABB hitBox = getHitBox();
 
             List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != owner);
             for (LivingEntity target : targets) {
@@ -116,7 +98,6 @@ public class Skill1Entity extends Entity implements GeoEntity {
             }
 
             if (owner != null) {
-                boolean hasWeapon = owner.getInventory().contains(new net.minecraft.world.item.ItemStack(com.shidran.hsrphainon.registry.ItemsRegistry.DAWNMAKER.get()));
 
                 net.minecraft.world.item.ItemStack stack = owner.getMainHandItem();
 
@@ -124,7 +105,6 @@ public class Skill1Entity extends Entity implements GeoEntity {
                     int lockTimer = stack.getOrCreateTag().getInt(LockTimer);
                     if (lockTimer <= 0) {
                         this.discard();
-                        this.shouldExpire = true;
                     }
                 }
             } else if (this.tickCount > 200) {
@@ -132,5 +112,27 @@ public class Skill1Entity extends Entity implements GeoEntity {
             }
         }
         super.tick();
+    }
+
+    private @NotNull AABB getHitBox() {
+        net.minecraft.world.phys.Vec3 lookVec = this.getLookAngle();
+
+        double maxReach = 21.0;
+        double currentReach = maxReach * Math.min(1.0, (double)this.tickCount / 20);
+        double midDist = currentReach * 0.5;
+
+        double hitCenterX = this.getX() + (lookVec.x * midDist);
+        double hitCenterY = this.getY() + (lookVec.y * midDist);
+        double hitCenterZ = this.getZ() + (lookVec.z * midDist);
+
+        float thickness = 0.5F;
+        double growX = Math.abs(lookVec.x) * midDist + thickness;
+        double growY = Math.abs(lookVec.y) * midDist + thickness;
+        double growZ = Math.abs(lookVec.z) * midDist + thickness;
+
+        return new AABB(
+                hitCenterX - growX, hitCenterY - growY, hitCenterZ - growZ,
+                hitCenterX + growX, hitCenterY + growY, hitCenterZ + growZ
+        );
     }
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  3",
+    " 5 ",
+    "7  "
+  ],
+  "key": {
+    "3": { "item": "minecraft:netherite_ingot" },
+    "5": { "item": "minecraft:nether_star" },
+    "7": { "item": "minecraft:netherite_sword" }
+  },
+  "result": {
+    "item": "hsrphainon:dawnmaker",
+    "count": 1
+  }
+}

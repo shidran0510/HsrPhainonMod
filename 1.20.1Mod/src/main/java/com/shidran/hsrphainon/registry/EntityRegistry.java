@@ -20,17 +20,16 @@ import static com.shidran.hsrphainon.common.HsrPhainonConstants.MOD_ID;
 public class EntityRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITIES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MOD_ID);
-    //剣エンティティ
+
     public static final RegistryObject<EntityType<Skill1Entity>> SKILL1_ENTITY =
             ENTITIES.register("skill1_entity", () -> EntityType.Builder.of(Skill1Entity::new, MobCategory.MISC)
                     .sized(1.0F, 1.0F)
                     .updateInterval(1)
                     .build("skill1_entity"));
 
-    // 隕石エンティティ
     public static final RegistryObject<EntityType<Skill2Entity>> SKILL2_ENTITY =
             ENTITIES.register("skill2_entity", () -> EntityType.Builder.of(Skill2Entity::new, MobCategory.MISC)
-                    .sized(2.0F, 2.0F) // 当たり判定のサイズ
+                    .sized(2.0F, 2.0F)
                     .build("skill2_entity"));
 
     @SubscribeEvent

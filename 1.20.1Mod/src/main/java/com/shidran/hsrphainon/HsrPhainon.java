@@ -15,8 +15,6 @@ import software.bernie.geckolib.GeckoLib;
 
 public class HsrPhainon {
 
-
-
     @SuppressWarnings("removal")
     public HsrPhainon(){
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();

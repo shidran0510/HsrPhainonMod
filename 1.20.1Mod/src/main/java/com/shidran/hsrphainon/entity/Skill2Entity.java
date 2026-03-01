@@ -8,10 +8,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
+
+import javax.annotation.Nonnull;
 
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
@@ -36,14 +39,14 @@ public class Skill2Entity extends Entity implements GeoEntity {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    protected void addAdditionalSaveData(@NotNull CompoundTag tag) {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    protected void readAdditionalSaveData(@NotNull CompoundTag tag) {
     }
 
-    @Override
+    @Override @Nonnull
     public net.minecraft.world.phys.AABB getBoundingBoxForCulling() {
         return this.getBoundingBox().inflate(30.0D);
     }

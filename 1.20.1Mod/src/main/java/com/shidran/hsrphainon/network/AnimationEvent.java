@@ -1,6 +1,5 @@
 package com.shidran.hsrphainon.network;
 
-import dev.kosmx.playerAnim.api.layered.AnimationStack;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
@@ -9,9 +8,10 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
+
 import java.util.UUID;
 
-import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
+import static com.shidran.hsrphainon.common.HsrPhainonConstants.MOD_ID;
 
 public class AnimationEvent {
     public static void handlePacket(UUID playerId, String animationId) {
@@ -20,22 +20,16 @@ public class AnimationEvent {
         var player = level.getPlayerByUUID(playerId);
 
         if (player instanceof AbstractClientPlayer clientPlayer) {
-            // 1. AssociatedData から登録したレイヤーを取得
             var data = PlayerAnimationAccess.getPlayerAssociatedData(clientPlayer);
             var layer = data.get(ResourceLocation.fromNamespaceAndPath(MOD_ID, animationId));
 
             if (layer instanceof ModifierLayer<?> modifierLayer) {
-                // 2. アニメーションをレジストリから取得
                 var anim = PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath(MOD_ID, animationId));
 
                 if (anim != null) {
-                    // 3. 再生
                     ((ModifierLayer<IAnimation>) modifierLayer).setAnimation(new KeyframeAnimationPlayer(anim));
                 }
             }
         }
-    }
-
-    private static void playOnLayer(AnimationStack stack, dev.kosmx.playerAnim.core.data.KeyframeAnimation anim) {
     }
 }

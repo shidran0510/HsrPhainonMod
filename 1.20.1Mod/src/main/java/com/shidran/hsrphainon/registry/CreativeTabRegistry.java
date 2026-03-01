@@ -10,21 +10,21 @@ import net.minecraftforge.registries.RegistryObject;
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 public class CreativeTabRegistry {
+
     public static final DeferredRegister<CreativeModeTab> MOD_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
     public static final RegistryObject<CreativeModeTab> HsrPhainon_MAIN = MOD_TABS.register("hsrphainon_tab",
             ()-> {return CreativeModeTab.builder()
-                    .icon(()->new ItemStack(ItemsRegistry.DAWNMAKER.get())) //タブのアイコン
+                    .icon(()->new ItemStack(ItemsRegistry.DAWNMAKER.get()))
                     .title(Component.translatable("itemGroup.hsrphainon_tab"))
                     .displayItems((param,output)->{
                         ItemStack phainonStack = new ItemStack(ItemsRegistry.DAWNMAKER.get());
                         phainonStack.getOrCreateTag().putBoolean(Mode, false);
                         output.accept(phainonStack);
 
-                        // 2. カスライナ形態の追加
                         ItemStack khaslanaStack = new ItemStack(ItemsRegistry.DAWNMAKER.get());
                         khaslanaStack.getOrCreateTag().putBoolean(Mode, true);
-                        // クリエイティブモードで取り出した時にモデルが変わるよう CustomModelData も設定
+
                         khaslanaStack.getOrCreateTag().putInt(CustomModelData, 1);
                         output.accept(khaslanaStack);
                     })

@@ -8,6 +8,7 @@ import com.shidran.hsrphainon.registry.EntityRegistry;
 import com.shidran.hsrphainon.registry.PacketRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -23,12 +24,13 @@ import net.minecraftforge.fml.common.Mod;
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 public class LogicDawnmaker {
-    public static void EffectSkill(Player player, String message, net.minecraft.sounds.SoundEvent sound, String animation, int cooldown, int tick, boolean show) {
+    public static void EffectSkill(Player player, String message, SoundEvent sound, String animation, int cooldown, int tick, boolean show) {
         Level world = world(player);
         CompoundTag tag = tag(player);
         Item item = item(player);
+        Object PlayerName = player.getName().getString();
 
-        player.sendSystemMessage(Component.literal(message)); //必殺技・発動
+        player.sendSystemMessage(Component.translatable((message), PlayerName));
         world.playSound(null, player, sound, SoundSource.PLAYERS, 1.0F, 1.0F);
         PacketRegistry.sendToAllClients(new AnimationPacket(player.getUUID(), animation));
         player.getCooldowns().addCooldown(item, cooldown);
@@ -52,18 +54,18 @@ public class LogicDawnmaker {
     }
 
     public enum Action {
-        None("None", (player, stack) -> {}),
+        None((player, stack) -> {}),
 
-        BasicAttack2("BasicAttack2", (player,stack) -> LogicDawnmaker.LogicBasicATK(player, 2)),
+        BasicAttack2((player, stack) -> LogicDawnmaker.LogicBasicATK(player, 2)),
 
-        LastAttack("LastAttack", (player,stack) -> player.level().explode(player, player.getX(), player.getY(), player.getZ(),
+        LastAttack((player, stack) -> world(player).explode(player, player.getX(), player.getY(), player.getZ(),
                 LastAttackDamage, false, explosionType)),
 
-        TransFormEffect("TransFormEffect", (player,stack) -> EffectRenderer.startTransformationEffect());
+        TransFormEffect((player, stack) -> EffectRenderer.startTransformationEffect());
 
         private final java.util.function.BiConsumer<Player, ItemStack> action;
 
-        Action(String actionId, java.util.function.BiConsumer<Player, ItemStack> actionLogic) {
+        Action(java.util.function.BiConsumer<Player, ItemStack> actionLogic) {
             this.action = actionLogic;
         }
 
@@ -72,7 +74,7 @@ public class LogicDawnmaker {
         }
 
         public static void Delay(ItemStack stack, int ticks, Action action) {
-            CompoundTag tag = stack.getOrCreateTag();
+            CompoundTag tag = tag(stack);
             tag.putInt(DelayTimer, ticks);
             tag.putString(ActionName, action.name());
         }
@@ -80,7 +82,7 @@ public class LogicDawnmaker {
 
     public static void RunTimer(ItemStack stack, Level world, Entity entity) {
         if (world.isClientSide || !(entity instanceof Player player)) return;
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = tag(stack);
 
         if (tag.contains(LockTimer)) {
             int lockTimer = tag.getInt(LockTimer);
@@ -103,9 +105,9 @@ public class LogicDawnmaker {
                 tag.putInt(ModelTimer, modelTimer - 1);
             } else {
                 if (tag.getBoolean(Mode)) {
-                    tag.putInt(CustomModelData, 1); // カスライナのモデルへ
+                    tag.putInt(CustomModelData, 1);
                 } else {
-                    tag.putInt(CustomModelData, 0); // ファイノンのモデルへ
+                    tag.putInt(CustomModelData, 0);
                 }
                 tag.putBoolean(ShowDawnmaker,false);
                 tag.remove(ModelTimer);
@@ -122,9 +124,7 @@ public class LogicDawnmaker {
                 try {
                     Action action = Action.valueOf(actionName);
                     action.execute(player, stack);
-                } catch (IllegalArgumentException e) {
-
-                }
+                } catch (IllegalArgumentException e) { return; }
 
                 tag.remove(DelayTimer);
                 tag.remove(ActionName);
@@ -138,8 +138,8 @@ public class LogicDawnmaker {
         float yRot = player.getYRot();
         float f = yRot * ((float) Math.PI / 180F);
 
-        double dxSide = (double) (-net.minecraft.util.Mth.cos(f));
-        double dzSide = (double) (-net.minecraft.util.Mth.sin(f));
+        double dxSide = -net.minecraft.util.Mth.cos(f);
+        double dzSide = -net.minecraft.util.Mth.sin(f);
 
         double sx = player.getX() + dxSide * 1.5;
         double sy = player.getY() + 10;
@@ -155,24 +155,23 @@ public class LogicDawnmaker {
 
     public static void LogicSkill2(Player player) {
         Level world = player.level();
-        int amount = Skill2MeteorAmount; // 出したい数
         float yRot = player.getYRot();
         float f = yRot * ((float) Math.PI / 180F);
-        double dx = (double) (-net.minecraft.util.Mth.sin(f));
-        double dz = (double) net.minecraft.util.Mth.cos(f);
+        double dx = -net.minecraft.util.Mth.sin(f);
+        double dz = net.minecraft.util.Mth.cos(f);
 
         net.minecraft.world.phys.Vec3 horizontalLook = new net.minecraft.world.phys.Vec3(dx, 0, dz);
         net.minecraft.world.phys.Vec3 sideVec = new net.minecraft.world.phys.Vec3(-dz, 0, dx);
 
-        for (int i = 0; i < amount; i++) {
+        for (int i = 0; i < Skill2MeteorAmount; i++) {
             Skill2Entity meteor = new Skill2Entity(EntityRegistry.SKILL2_ENTITY.get(), world);
 
-            // ランダムなオフセットを計算 (例: 横幅±5ブロック、前後±3ブロックの範囲)
+
             double randomSide = (world.random.nextDouble() - 0.5) * Skill2MeteorDensity;
             double randomForward = (world.random.nextDouble() - 0.5) * Skill2MeteorDensity;
 
-            double forwardOffset = 20.0 + randomForward; // 基本の前方距離 8.0
-            double heightOffset = 15.0 + (world.random.nextDouble() * 6.0); // 高さもランダムに
+            double forwardOffset = 20.0 + randomForward;
+            double heightOffset = 15.0 + (world.random.nextDouble() * 6.0);
 
             double spawnX = player.getX() + (horizontalLook.x * forwardOffset) + (sideVec.x * randomSide);
             double spawnY = player.getY() + heightOffset;
@@ -183,8 +182,8 @@ public class LogicDawnmaker {
         }
         Skill2Entity bigMeteor = new Skill2Entity(EntityRegistry.SKILL2_ENTITY.get(), world);
 
-        double bigForwardOffset = 20.0; // 少し遠くに
-        double bigHeightOffset = 40.0; // 小さいのより高い位置から
+        double bigForwardOffset = 20.0;
+        double bigHeightOffset = 40.0;
 
         double bigX = player.getX() + (horizontalLook.x * bigForwardOffset);
         double bigY = player.getY() + bigHeightOffset;
@@ -219,35 +218,29 @@ public class LogicDawnmaker {
             });
         }
         if (combo == 2) {
-            // 1. 判定のパラメータ設定
-            double radius = 4.5;    // 攻撃の届く距離（半径）
-            double angle = 60.0;    // 扇状の広さ（左右30度ずつ、計60度）
+            double radius = 4.5;
+            double angle = 60.0;
             Vec3 center = player.position();
-            Vec3 lookVec = player.getLookAngle().normalize(); // プレイヤーの向いている方向
+            Vec3 lookVec = player.getLookAngle().normalize();
 
-            // 2. まずは大きめの立方体(AABB)で周囲のエンティティをざっくり取得
             net.minecraft.world.phys.AABB area = player.getBoundingBox().inflate(radius, 2.0, radius);
 
             world.getEntities(player, area, entity -> entity instanceof net.minecraft.world.entity.LivingEntity)
                     .forEach(entity -> {
                         if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
-                            // 3. プレイヤーから敵への方向ベクトルを計算
+
                             Vec3 toTarget = livingEntity.position().subtract(center).normalize();
 
-                            // 4. ベクトルの内積を使って、射程内かつ扇状の範囲内にいるか判定
-                            double dotProduct = lookVec.dot(toTarget); // 2つのベクトルの重なり具合（1.0で完全一致）
-                            double cosAngle = Math.cos(Math.toRadians(angle)); // 判定のしきい値
+                            double dotProduct = lookVec.dot(toTarget);
+                            double cosAngle = Math.cos(Math.toRadians(angle));
 
-                            // 距離チェック ＆ 角度チェック（内積 > cos(角度) で範囲内）
                             if (player.distanceTo(livingEntity) <= radius && dotProduct > cosAngle) {
 
-                                // 攻撃処理
                                 livingEntity.hurt(player.damageSources().playerAttack(player), BasicDamage * 1.5f);
 
-                                // ノックバック（プレイヤーから遠ざける方向）
                                 double dX = livingEntity.getX() - player.getX();
                                 double dZ = livingEntity.getZ() - player.getZ();
-                                livingEntity.knockback(0.8, dX, dZ); // 拡散するように外側へ飛ばす
+                                livingEntity.knockback(0.8, dX, dZ);
                             }
                         }
                     });
@@ -280,15 +273,15 @@ public class LogicDawnmaker {
             ItemStack stack = player.getMainHandItem();
             if (!(stack.getItem() instanceof ItemDawnmaker)) return;
 
-            CompoundTag tag = stack.getOrCreateTag();
+            CompoundTag tag = tag(stack);
 
             float damage = event.getAmount();
 
             if (tag.getBoolean(Mode) && damage >= player.getHealth()) {
                 event.setCanceled(true);
 
-                player.setHealth(player.getMaxHealth()); // ハート1個分で復活
-                player.removeAllEffects(); // デバフ解除
+                player.setHealth(player.getMaxHealth());
+                player.removeAllEffects();
 
                 if (stack.getItem() instanceof ItemDawnmaker dawnmaker) {
                     dawnmaker.Ultimate(stack, player);

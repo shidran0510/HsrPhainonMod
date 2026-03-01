@@ -1,7 +1,6 @@
 package com.shidran.hsrphainon.item;
 
 import com.google.common.collect.Multimap;
-import com.shidran.hsrphainon.common.HsrPhainonConstants;
 import com.shidran.hsrphainon.registry.SoundsRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +15,11 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -35,14 +39,15 @@ public class ItemDawnmaker extends SwordItem {
 
     private boolean getMode(ItemStack stack) {
         if (stack == null || !stack.hasTag()) return false;
-        return stack.getOrCreateTag().getBoolean(Mode);
+        CompoundTag tag = tag(stack);
+        return tag.getBoolean(Mode);
     }
 
-    public void inventoryTick (ItemStack stack,@Nonnull Level world,@Nonnull Entity entity, int slot, boolean isSelected){
+    public void inventoryTick(@NotNull ItemStack stack, @Nonnull Level world, @Nonnull Entity entity, int slot, boolean isSelected) {
         CompoundTag tag = tag(stack);
         if (tag == null) return;
 
-        LogicDawnmaker.RunTimer(stack,world,entity);
+        LogicDawnmaker.RunTimer(stack, world, entity);
     }
 
     public void Ultimate(ItemStack stack, Player player) {
@@ -54,29 +59,25 @@ public class ItemDawnmaker extends SwordItem {
             boolean newMode = !tag.getBoolean(Mode);
             tag.putBoolean(Mode, newMode);
 
-            String PlayerName = player.getName().getString();
+
             int LockTick = !newMode ? 100 : 130;
 
             if (!newMode) {
                 LogicDawnmaker.EffectSkill(
                         player,
-                        PlayerName + "は再び輪廻に足を踏み入れた・・・",
+                        "skill.hsrphainon.ultimate.end",
                         SoundsRegistry.LastAttackSE.get(),
                         "lastattack",
-                        240,
-                        100,
-                        false
+                        240, 100, false
                 );
                 Delay(stack, 80, LastAttack);
             } else {
                 LogicDawnmaker.EffectSkill(
                         player,
-                        "永劫の焼世、背負うべき未来",
+                        "skill.hsrphainon.ultimate.start",
                         SoundsRegistry.UltimateSE.get(),
                         "transform",
-                        160,
-                        28,
-                        true
+                        160, 28, true
 
                 );
                 Delay(stack, 12, TransFormEffect);
@@ -93,12 +94,10 @@ public class ItemDawnmaker extends SwordItem {
 
             LogicDawnmaker.EffectSkill(
                     player,
-                    "災厄・魂命の滅却",
+                    "skill.hsrphainon.skill1.name",
                     SoundsRegistry.Skill1SE.get(),
                     "skill1",
-                    120,
-                    100,
-                    false
+                    120, 100, false
             );
 
             LogicDawnmaker.LogicSkill1(player);
@@ -113,12 +112,10 @@ public class ItemDawnmaker extends SwordItem {
 
             LogicDawnmaker.EffectSkill(
                     player,
-                    "支柱・死星の天裁",
+                    "skill.hsrphainon.skill2.name",
                     SoundsRegistry.Skill2SE.get(),
                     "skill2",
-                    120,
-                    100,
-                    false
+                    120, 100, false
             );
 
             LogicDawnmaker.LogicSkill2(player);
@@ -132,50 +129,39 @@ public class ItemDawnmaker extends SwordItem {
         if (!world.isClientSide) {
             LogicDawnmaker.EffectSkill(
                     player,
-                    "創生・血荊の葬送",
+                    "skill.hsrphainon.basic_atk.name",
                     SoundsRegistry.BasicAttackSE.get(),
                     "basicattack",
-                    60,
-                    60,
-                    true
+                    60, 60, true
             );
-            LogicDawnmaker.LogicBasicATK(player,1);
+            LogicDawnmaker.LogicBasicATK(player, 1);
             LogicDawnmaker.Action.Delay(stack, 40, BasicAttack2);
         }
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level world,@Nonnull List<Component> list,@Nonnull TooltipFlag flag) {
-        // モード名の表示（常に表示）
-        if (stack.hasTag() && stack.getTag().getBoolean(Mode)) {
-            list.add(Component.literal("§f現在の形態: §eカスライナ").withStyle(ChatFormatting.ITALIC));
-        } else {
-            list.add(Component.literal("§f現在の形態: §bファイノン").withStyle(ChatFormatting.ITALIC));
-        }
+    public void appendHoverText(@Nonnull ItemStack stack, Level world, @Nonnull List<Component> list, @Nonnull TooltipFlag flag) {
+        CompoundTag tag = tag(stack);
 
-        list.add(Component.literal("")); // 空行
+        String modeKey = (stack.hasTag() && tag.getBoolean(Mode)) ?
+                "message.hsrphainon.mode_change.khaslana" : "message.hsrphainon.mode_change.phainon";
+        list.add(Component.translatable(modeKey).withStyle(ChatFormatting.ITALIC));
 
-        // Shiftキー判定
+        list.add(Component.literal(""));
+
         if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
-            list.add(Component.literal("§fキャラクター詳細").withStyle(ChatFormatting.BOLD));
+            list.add(Component.translatable("message.hsrphainon.details_title").withStyle(ChatFormatting.BOLD));
 
-            String trueName = stack.getTag().getBoolean(Mode) ? "カスライナ" : "█████";
+            String trueName = tag.getBoolean(Mode) ? "name.hsrphainon.khaslana" : "name.hsrphainon.nameless";
 
-            list.add(Component.literal("""
-            エリュシオンは世界から切り離された辺境の村であり、今では複雑で謎めいた伝説しか残されていない。
-            無名の英雄%s、「世負い」の火種を宿す黄金裔。全世界の理想をその胸に刻み、万人の運命を背負い、新たな世界に最初の曙光をもたらす者である
-            ——「もし黎明が未だ訪れていないというのなら、この身を心火で燃やし尽くし、明日の烈日となろう！」
-            """.formatted(trueName)).withStyle(ChatFormatting.GRAY));
-
+            list.add(Component.translatable("message.hsrphainon.description", trueName).withStyle(ChatFormatting.GRAY));
         } else {
-            // 非Shift時のガイド
-            list.add(Component.literal("§7[Shiftキーで詳細を表示]").withStyle(ChatFormatting.DARK_GRAY));
+            list.add(Component.translatable("message.hsrphainon.shift_hint").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         if (slotChanged) return true;
-
         return oldStack.getOrCreateTag().getBoolean(Mode) != newStack.getOrCreateTag().getBoolean(Mode);
     }
 
@@ -187,30 +173,3 @@ public class ItemDawnmaker extends SwordItem {
         return getMode(stack) ? KHASLANA_MODIFIERS : PHAINON_MODIFIERS;
     }
 }
-
-//geckolib ここから
-//    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-//
-//    @Override
-//    public AnimatableInstanceCache getAnimatableInstanceCache() {
-//        return this.cache;
-//    }
-//
-//    @Override
-//    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-//    }
-//
-//    @Override
-//    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-//        consumer.accept(new IClientItemExtensions() {
-//            private DawnmakerRenderer renderer;
-//
-//            @Override
-//            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-//                if (this.renderer == null)
-//                    this.renderer = new DawnmakerRenderer(); // ここで作ったレンダラーを指定
-//                return this.renderer;
-//            }
-//        });
-//    }
-// ここまで

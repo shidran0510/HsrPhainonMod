@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.Mod;
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.Ultimate;
 
-// クライアント側キー入力イベント
 @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
 public class KeyEvent {
     @SubscribeEvent
@@ -38,12 +37,13 @@ public class KeyEvent {
     @SubscribeEvent
     public static void onInteraction(InputEvent.InteractionKeyMappingTriggered event) {
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+
         if (mc.player == null) return;
 
         if (event.isAttack()) {
             ItemStack stack = mc.player.getMainHandItem();
 
-            if (stack.getItem() instanceof ItemDawnmaker && stack.hasTag() && stack.getTag().getInt(LockTimer) > 0) {
+            if (stack.getItem() instanceof ItemDawnmaker && stack.hasTag() && stack.getOrCreateTag().getInt(LockTimer) > 0) {
                 event.setCanceled(true);
                 event.setSwingHand(false);
             }
@@ -56,17 +56,17 @@ public class KeyEvent {
         ItemStack stack = player.getMainHandItem();
 
         if (stack.getItem() instanceof ItemDawnmaker && stack.hasTag()) {
-            if (stack.getTag().getInt(LockTimer) > 0) {
+            if (stack.getOrCreateTag().getInt(LockTimer) > 0) {
                 net.minecraft.client.player.Input input = event.getInput();
 
-                event.getInput().forwardImpulse = 0;
-                event.getInput().leftImpulse = 0;
-                event.getInput().up = false;
-                event.getInput().down = false;
-                event.getInput().left = false;
-                event.getInput().right = false;
-                event.getInput().jumping = false;
-                event.getInput().shiftKeyDown = false;
+                input.forwardImpulse = 0;
+                input.leftImpulse = 0;
+                input.up = false;
+                input.down = false;
+                input.left = false;
+                input.right = false;
+                input.jumping = false;
+                input.shiftKeyDown = false;
             }
         }
     }

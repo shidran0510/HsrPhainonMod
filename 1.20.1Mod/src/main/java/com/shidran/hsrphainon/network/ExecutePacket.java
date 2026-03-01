@@ -34,7 +34,6 @@ public class ExecutePacket {
 
                 if (stack.getItem() instanceof ItemDawnmaker dawnmaker) {
 
-                    // 送られてきた type に応じて処理を分岐
                     switch (this.type) {
                         case BasicATK:
                             dawnmaker.BasicATK(stack,player);

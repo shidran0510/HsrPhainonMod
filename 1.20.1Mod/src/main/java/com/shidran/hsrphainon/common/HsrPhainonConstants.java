@@ -30,7 +30,6 @@ public class HsrPhainonConstants {
     public static Level world(Player player) { return player.level(); }
     public static CompoundTag tag(Player player) { return player.getMainHandItem().getOrCreateTag(); }
     public static CompoundTag tag(ItemStack stack) {return stack.getTag(); }
-    public static ItemStack stack(Player player) { return player.getMainHandItem(); }
     public static Item item(Player player) {return player.getMainHandItem().getItem();}
 //スキル設定
     public static final float BasicDamage = 30.0F;
