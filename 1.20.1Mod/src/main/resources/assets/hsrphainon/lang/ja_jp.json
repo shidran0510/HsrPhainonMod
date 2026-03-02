@@ -1,24 +1,21 @@
 {
   "itemGroup.hsrphainon_tab" : "HSR ファイノン",
-
-  "item.hsrphainon.dawnmaker" : "ヘリオス",
-
   "key.categories.hsrphainon": "HSR ファイノン",
 
+  "item.hsrphainon.dawnmaker" : "ヘリオス",
+  "item.hsrphainon.coreflame_worldbearing": "「世負い」の火種",
+
   "key.hsrphainon.Ultimate": "必殺技",
-
   "key.hsrphainon.BasicATK": "通常攻撃",
-
   "key.hsrphainon.Skill1": "戦闘スキル1" ,
-
   "key.hsrphainon.Skill2": "戦闘スキル2",
 
-  "name.hsrphainon.khaslana": "カスライナ",
-  "name.hsrphainon.nameless": "█████",
   "message.hsrphainon.mode_change.phainon": "§f現在の形態: §bファイノン",
   "message.hsrphainon.mode_change.khaslana": "§f現在の形態: §eカスライナ",
   "message.hsrphainon.shift_hint": "§7[Shiftキーで詳細を表示]",
   "message.hsrphainon.details_title": "§fキャラクター詳細",
+  "name.hsrphainon.khaslana": "カスライナ",
+  "name.hsrphainon.nameless": "█████",
   "message.hsrphainon.description": "エリュシオンは世界から切り離された辺境の村であり、今では複雑で謎めいた伝説しか残されていない。\n無名の英雄%s、「世負い」の火種を宿す黄金裔。全世界の理想をその胸に刻み、万人の運命を背負い、新たな世界に最初の曙光をもたらす者である\n——「もし黎明が未だ訪れていないというのなら、この身を心火で燃やし尽くし、明日の烈日となろう！」",
 
   "skill.hsrphainon.ultimate.start": "永劫の焼世、背負うべき未来",

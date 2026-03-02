@@ -17,10 +17,15 @@ public class ItemsRegistry {
 
     public static final RegistryObject<SwordItem> DAWNMAKER = ITEMS.register("dawnmaker",
             () -> new ItemDawnmaker(
-                    Tiers.DIAMOND,          // Tier
-                    7,                      // 攻撃力補正
-                    0F,                  // 攻撃速度
-                    new Item.Properties()   // 設定
+                    Tiers.NETHERITE,     // Tier
+                    1,                   // 攻撃力補正
+                    -2.4F,               // 攻撃速度
+                    new Item.Properties()// 設定
+                            .stacksTo(1)
+                            .fireResistant()
                     )
             );
+
+    public static final RegistryObject<Item> COREFLAME_WORLDBEARING = ITEMS.register("coreflame_worldbearing",
+            () -> new Item(new Item.Properties()));
 }

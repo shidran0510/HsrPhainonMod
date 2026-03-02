@@ -17,10 +17,6 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -46,7 +42,6 @@ public class ItemDawnmaker extends SwordItem {
 
     public void inventoryTick(@NotNull ItemStack stack, @Nonnull Level world, @Nonnull Entity entity, int slot, boolean isSelected) {
         CompoundTag tag = tag(stack);
-        if (tag == null) return;
 
         LogicDawnmaker.RunTimer(stack, world, entity);
     }
@@ -153,7 +148,9 @@ public class ItemDawnmaker extends SwordItem {
         if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             list.add(Component.translatable("message.hsrphainon.details_title").withStyle(ChatFormatting.BOLD));
 
-            String trueName = tag.getBoolean(Mode) ? "name.hsrphainon.khaslana" : "name.hsrphainon.nameless";
+            String nameKey = tag.getBoolean(Mode) ? "name.hsrphainon.khaslana" : "name.hsrphainon.nameless";
+
+            Component trueName = Component.translatable(nameKey);
 
             list.add(Component.translatable("message.hsrphainon.description", trueName).withStyle(ChatFormatting.GRAY));
         } else {
@@ -174,5 +171,22 @@ public class ItemDawnmaker extends SwordItem {
                     HsrPhainonConstants.getPhainonModifiers();
         }
         return super.getAttributeModifiers(slot, stack);
+    }
+
+    @Override //耐久値無限
+    public boolean canBeDepleted() {
+        return false;
+    }
+    @Override //エンチャント許可
+    public boolean isEnchantable(@Nonnull ItemStack stack) {
+        return true;
+    }
+    @Override //アイテム破壊無効
+    public boolean onEntityItemUpdate(ItemStack stack, net.minecraft.world.entity.item.ItemEntity entity) {
+        entity.setInvulnerable(true);return false;
+    }
+    @Override //火炎耐性
+    public boolean isFireResistant() {
+        return true;
     }
 }

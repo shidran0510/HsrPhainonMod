@@ -29,7 +29,7 @@ public class HsrPhainonConstants {
 //共通変数定義
     public static Level world(Player player) { return player.level(); }
     public static CompoundTag tag(Player player) { return player.getMainHandItem().getOrCreateTag(); }
-    public static CompoundTag tag(ItemStack stack) {return stack.getTag(); }
+    public static CompoundTag tag(ItemStack stack) {return stack.getOrCreateTag();}
     public static Item item(Player player) {return player.getMainHandItem().getItem();}
 //キー番号
     public static final int BasicATK = 0;
@@ -49,7 +49,6 @@ public class HsrPhainonConstants {
     public static Multimap<Attribute, AttributeModifier> PhainonDamage;
     public static Multimap<Attribute, AttributeModifier> KhaslanaDamage;
 
-// MOD起動時に呼び出す初期化メソッド
 public static Multimap<Attribute, AttributeModifier> getPhainonModifiers() {
     double phainonDmg = HsrPhainonConfig.PhainonDamage.get();
     ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();

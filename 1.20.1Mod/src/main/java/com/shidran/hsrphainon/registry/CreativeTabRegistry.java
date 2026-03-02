@@ -27,6 +27,9 @@ public class CreativeTabRegistry {
 
                         khaslanaStack.getOrCreateTag().putInt(CustomModelData, 1);
                         output.accept(khaslanaStack);
+
+                        ItemStack coreflame_worldbearing = new ItemStack(ItemsRegistry.COREFLAME_WORLDBEARING.get());
+                        output.accept(coreflame_worldbearing);
                     })
                     .build();
 
