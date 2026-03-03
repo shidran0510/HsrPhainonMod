@@ -77,7 +77,7 @@ public class Skill2Entity extends Entity implements GeoEntity {
 
         if (this.onGround()) {
             if (!this.level().isClientSide) {
-                float power = this.isBig() ? getSkill2DamageMax() : getSkill2DamageMin();
+                float power = this.isBig() ? getSkill2DamageLarge() : getSkill2DamageSmall();
                 this.level().explode(
                         this,
                         this.getX(),

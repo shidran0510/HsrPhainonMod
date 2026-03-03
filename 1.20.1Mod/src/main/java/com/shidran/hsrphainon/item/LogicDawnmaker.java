@@ -16,10 +16,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
@@ -41,6 +37,12 @@ public class LogicDawnmaker {
     }
 
     public static void RunPlayerLock(Player player) {
+        CompoundTag tag = tag(player);
+        tag.putDouble("LockX", player.getX());
+        tag.putDouble("LockY", player.getY());
+        tag.putDouble("LockZ", player.getZ());
+
+        player.teleportTo(tag.getDouble("LockX"),tag.getDouble("LockY"),tag.getDouble("LockZ"));
         player.setDeltaMovement(Vec3.ZERO);
         player.setNoGravity(true);
         player.setInvulnerable(true);
@@ -87,7 +89,6 @@ public class LogicDawnmaker {
         if (tag.contains(LockTimer)) {
             int lockTimer = tag.getInt(LockTimer);
 
-
             if (lockTimer > 0) {
                 LogicDawnmaker.RunPlayerLock(player);
                 tag.putInt(LockTimer, lockTimer - 1);
@@ -99,7 +100,7 @@ public class LogicDawnmaker {
 
         if (tag.contains(ModelTimer)) {
             int modelTimer = tag.getInt(ModelTimer);
-            if (!tag.getBoolean(ShowDawnmaker)) { tag.putInt(CustomModelData, 33550336); }
+            if (!tag.getBoolean(ShowDawnmaker)) { tag.putInt(CustomModelData, 2); }
 
             if (modelTimer > 0) {
                 tag.putInt(ModelTimer, modelTimer - 1);
@@ -167,11 +168,11 @@ public class LogicDawnmaker {
             Skill2Entity meteor = new Skill2Entity(EntityRegistry.SKILL2_ENTITY.get(), world);
 
 
-            double randomSide = (world.random.nextDouble() - 0.5) * getSkill2MeteorDensity();
-            double randomForward = (world.random.nextDouble() - 0.5) * getSkill2MeteorDensity();
+            double randomSide = (world.random.nextDouble() - 0.5) * getSkill2MeteorHorizontalRange();
+            double randomForward = (world.random.nextDouble() - 0.5) * getSkill2MeteorHorizontalRange();
 
             double forwardOffset = 20.0 + randomForward;
-            double heightOffset = 15.0 + (world.random.nextDouble() * 6.0);
+            double heightOffset = 15.0 + (world.random.nextDouble() * getSkill2MeteorVerticalRange());
 
             double spawnX = player.getX() + (horizontalLook.x * forwardOffset) + (sideVec.x * randomSide);
             double spawnY = player.getY() + heightOffset;
@@ -183,7 +184,7 @@ public class LogicDawnmaker {
         Skill2Entity bigMeteor = new Skill2Entity(EntityRegistry.SKILL2_ENTITY.get(), world);
 
         double bigForwardOffset = 20.0;
-        double bigHeightOffset = 40.0;
+        double bigHeightOffset = getSkill2MeteorVerticalRange() + 30.0;
 
         double bigX = player.getX() + (horizontalLook.x * bigForwardOffset);
         double bigY = player.getY() + bigHeightOffset;
@@ -244,61 +245,6 @@ public class LogicDawnmaker {
                             }
                         }
                     });
-        }
-    }
-
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-    public static class EventHandler {
-
-        @SubscribeEvent
-        public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-
-            if (event.phase != TickEvent.Phase.END || event.player.level().isClientSide) {
-                return;
-            }
-
-            Player player = event.player;
-
-            boolean hasSword = hasDawnmakerInInventory(player);
-
-            if (!hasSword && player.isNoGravity()) {
-                LogicDawnmaker.StopPlayerLock(player);
-            }
-        }
-
-        @SubscribeEvent
-        public static void onLivingDamage(LivingDamageEvent event) {
-            if (!(event.getEntity() instanceof Player player)) return;
-
-            ItemStack stack = player.getMainHandItem();
-            if (!(stack.getItem() instanceof ItemDawnmaker)) return;
-
-            CompoundTag tag = tag(stack);
-
-            float damage = event.getAmount();
-
-            if (tag.getBoolean(Mode) && damage >= player.getHealth()) {
-                event.setCanceled(true);
-
-                player.setHealth(player.getMaxHealth());
-                player.removeAllEffects();
-
-                if (stack.getItem() instanceof ItemDawnmaker dawnmaker) {
-                    dawnmaker.Ultimate(stack, player);
-
-                    tag.putBoolean(Mode, false);
-                }
-            }
-        }
-
-        private static boolean hasDawnmakerInInventory(Player player) {
-            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                ItemStack stack = player.getInventory().getItem(i);
-                if (!stack.isEmpty() && stack.getItem() instanceof ItemDawnmaker) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

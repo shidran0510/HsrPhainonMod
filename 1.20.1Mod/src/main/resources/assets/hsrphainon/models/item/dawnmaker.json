@@ -6,8 +6,9 @@
 		"0": "hsrphainon:item/dawnmaker"
 	},
 	"overrides": [
-		{ "predicate": { "custom_model_data": 1 }, "model": "hsrphainon:item/dawnmaker2"},
-		{ "predicate": { "custom_model_data": 33550336 }, "model": "hsrphainon:item/none"}
+		{ "predicate": { "custom_model_data": 0 }, "model": "hsrphainon:item/dawnmaker" },
+		{ "predicate": { "custom_model_data": 1 }, "model": "hsrphainon:item/dawnmaker2" },
+		{ "predicate": { "custom_model_data": 2 }, "model": "hsrphainon:item/none" }
 	],
 	"elements": [
 		{

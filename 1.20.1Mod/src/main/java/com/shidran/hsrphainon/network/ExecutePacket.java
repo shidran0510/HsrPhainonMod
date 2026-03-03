@@ -30,7 +30,7 @@ public class ExecutePacket {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null) {
-                ItemStack stack = player.getMainHandItem();
+                ItemStack stack = stack(player);
 
                 if (stack.getItem() instanceof ItemDawnmaker dawnmaker) {
 

@@ -2,11 +2,7 @@ package com.shidran.hsrphainon;
 
 import com.shidran.hsrphainon.common.HsrPhainonConfig;
 import com.shidran.hsrphainon.network.AnimationLayer;
-import com.shidran.hsrphainon.registry.EntityRegistry;
-import com.shidran.hsrphainon.registry.PacketRegistry;
-import com.shidran.hsrphainon.registry.ItemsRegistry;
-import com.shidran.hsrphainon.registry.CreativeTabRegistry;
-import com.shidran.hsrphainon.registry.SoundsRegistry;
+import com.shidran.hsrphainon.registry.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;

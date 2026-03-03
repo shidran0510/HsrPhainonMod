@@ -1,9 +1,11 @@
 package com.shidran.hsrphainon.item;
 
 import com.google.common.collect.Multimap;
+import com.shidran.hsrphainon.client.renderer.DawnmakerRenderer;
 import com.shidran.hsrphainon.common.HsrPhainonConstants;
 import com.shidran.hsrphainon.registry.SoundsRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -16,16 +18,25 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
+
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 import static com.shidran.hsrphainon.item.LogicDawnmaker.Action.*;
 
-public class ItemDawnmaker extends SwordItem {
+public class ItemDawnmaker extends SwordItem implements GeoItem {
 
     public static final UUID BaseAttackDmageUUID = BASE_ATTACK_DAMAGE_UUID;
     public static final UUID BaseAttackSpeedUUID = BASE_ATTACK_SPEED_UUID;
@@ -188,5 +199,43 @@ public class ItemDawnmaker extends SwordItem {
     @Override //火炎耐性
     public boolean isFireResistant() {
         return true;
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, event ->
+                PlayState.STOP));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private DawnmakerRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null) {
+                    this.renderer = new DawnmakerRenderer();
+                }
+                return this.renderer;
+            }
+        });
+    }
+
+    private ItemStack renderingStack;
+
+    public void setRenderingStack(ItemStack stack) {
+        this.renderingStack = stack;
+    }
+
+    public ItemStack getRenderingStack() {
+        return this.renderingStack;
     }
 }

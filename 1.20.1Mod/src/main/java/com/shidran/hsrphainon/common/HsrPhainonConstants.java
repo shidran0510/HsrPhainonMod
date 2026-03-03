@@ -30,7 +30,9 @@ public class HsrPhainonConstants {
     public static Level world(Player player) { return player.level(); }
     public static CompoundTag tag(Player player) { return player.getMainHandItem().getOrCreateTag(); }
     public static CompoundTag tag(ItemStack stack) {return stack.getOrCreateTag();}
+    public static ItemStack stack(Player player) {return player.getMainHandItem();}
     public static Item item(Player player) {return player.getMainHandItem().getItem();}
+
 //キー番号
     public static final int BasicATK = 0;
     public static final int Skill1 = 1;
@@ -39,10 +41,11 @@ public class HsrPhainonConstants {
 //スキルダメージ
     public static float getBasicATKDamage() { return HsrPhainonConfig.BasicATKDamage.get().floatValue(); }
     public static float getSkill1Damage() { return HsrPhainonConfig.Skill1Damage.get().floatValue(); }
-    public static float getSkill2DamageMin() { return HsrPhainonConfig.Skill2DamageMin.get().floatValue(); }
-    public static float getSkill2DamageMax() { return HsrPhainonConfig.Skill2DamageMax.get().floatValue(); }
+    public static float getSkill2DamageSmall() { return HsrPhainonConfig.Skill2DamageSmall.get().floatValue(); }
+    public static float getSkill2DamageLarge() { return HsrPhainonConfig.Skill2DamageLarge.get().floatValue(); }
     public static int getSkill2MeteorAmount() { return HsrPhainonConfig.Skill2MeteorAmount.get(); }
-    public static float getSkill2MeteorDensity() { return HsrPhainonConfig.Skill2MeteorDensity.get().floatValue(); }
+    public static float getSkill2MeteorHorizontalRange() { return HsrPhainonConfig.Skill2MeteorHorizontalRange.get().floatValue(); }
+    public static float getSkill2MeteorVerticalRange() { return HsrPhainonConfig.Skill2MeteorVerticalRange.get().floatValue(); }
     public static float getLastAttackDamage() { return HsrPhainonConfig.LastAttackDamage.get().floatValue(); }
     public static Level.ExplosionInteraction getExplosionType() {return HsrPhainonConfig.ExplosionType.get();}
 // 武器属性 (AttributeModifier)
