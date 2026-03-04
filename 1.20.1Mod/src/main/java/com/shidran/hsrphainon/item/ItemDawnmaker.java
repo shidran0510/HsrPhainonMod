@@ -67,18 +67,9 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
             tag.putBoolean(Mode, newMode);
 
 
-            int LockTick = !newMode ? 100 : 130;
+            int LockTick = newMode ? 130 : 100;
 
-            if (!newMode) {
-                LogicDawnmaker.EffectSkill(
-                        player,
-                        "skill.hsrphainon.ultimate.end",
-                        SoundsRegistry.LastAttackSE.get(),
-                        "lastattack",
-                        240, 100, false
-                );
-                Delay(stack, 80, LastAttack);
-            } else {
+            if (tag.getBoolean(Mode)) {
                 LogicDawnmaker.EffectSkill(
                         player,
                         "skill.hsrphainon.ultimate.start",
@@ -88,26 +79,49 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
 
                 );
                 Delay(stack, 12, TransFormEffect);
+            } else {
+                LogicDawnmaker.EffectSkill(
+                        player,
+                        "skill.hsrphainon.ultimate.end",
+                        SoundsRegistry.LastAttackSE.get(),
+                        "lastattack",
+                        240, 100, false
+                );
+                Delay(stack, 80, LastAttack);
             }
             tag.putInt(LockTimer, LockTick);
         }
     }
 
     public void Skill1(ItemStack stack, Player player) {
-        if (!getMode(stack) || player.getCooldowns().isOnCooldown(this)) return;
+        if (player.getCooldowns().isOnCooldown(this)) return;
         Level world = world(player);
+        CompoundTag tag = tag(player);
 
         if (!world.isClientSide) {
+            if (tag.getBoolean(Mode)) {
 
-            LogicDawnmaker.EffectSkill(
-                    player,
-                    "skill.hsrphainon.skill1.name",
-                    SoundsRegistry.Skill1SE.get(),
-                    "skill1",
-                    120, 100, false
-            );
+                LogicDawnmaker.EffectSkill(
+                        player,
+                        "skill.hsrphainon.skill1.name",
+                        SoundsRegistry.Skill1SE.get(),
+                        "skill1",
+                        120, 100, false
+                );
 
-            LogicDawnmaker.LogicSkill1(player);
+                LogicDawnmaker.LogicSkill1(player);
+            } else {
+                LogicDawnmaker.EffectSkill(
+                        player,
+                        "skill.hsrphainon.skill.name",
+                        SoundsRegistry.SkillSE.get(),
+                        "skill",
+                        120, 17, true
+                );
+                Delay(stack, 40, Skill);
+                tag.putInt(CustomModelData,3);
+                tag.putInt(LockTimer, 50);
+            }
         }
     }
 

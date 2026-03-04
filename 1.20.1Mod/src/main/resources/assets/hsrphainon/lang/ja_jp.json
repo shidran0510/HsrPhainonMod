@@ -18,9 +18,10 @@
   "name.hsrphainon.nameless": "█████",
   "message.hsrphainon.description": "エリュシオンは世界から切り離された辺境の村であり、今では複雑で謎めいた伝説しか残されていない。\n無名の英雄%s、「世負い」の火種を宿す黄金裔。全世界の理想をその胸に刻み、万人の運命を背負い、新たな世界に最初の曙光をもたらす者である\n——「もし黎明が未だ訪れていないというのなら、この身を心火で燃やし尽くし、明日の烈日となろう！」",
 
-  "skill.hsrphainon.ultimate.start": "永劫の焼世、背負うべき未来",
-  "skill.hsrphainon.ultimate.end": "%sは再び輪廻に足を踏み入れた・・・",
+  "skill.hsrphainon.basic_atk.name": "創生・血荊の葬送",
+  "skill.hsrphainon.skill.name": "黎明の創世、天地を開闢す",
   "skill.hsrphainon.skill1.name": "災厄・魂命の滅却",
   "skill.hsrphainon.skill2.name": "支柱・死星の天裁",
-  "skill.hsrphainon.basic_atk.name": "創生・血荊の葬送"
+  "skill.hsrphainon.ultimate.start": "永劫の焼世、背負うべき未来",
+  "skill.hsrphainon.ultimate.end": "%sは再び輪廻に足を踏み入れた・・・"
 }

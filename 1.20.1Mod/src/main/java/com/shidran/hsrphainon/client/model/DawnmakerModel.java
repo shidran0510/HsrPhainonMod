@@ -10,40 +10,28 @@ import static com.shidran.hsrphainon.common.HsrPhainonConstants.Mode;
 
 public class DawnmakerModel extends GeoModel<ItemDawnmaker> {
 
-    private ItemStack currentStack;
-    private boolean hidden = false;
-
-    public void setModel(boolean model) {
-    }
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-    public void setCustomResources(ResourceLocation model, ResourceLocation texture) {
-    }
-
     @Override
     public ResourceLocation getModelResource(ItemDawnmaker animatable) {
-        if (this.hidden) {
+        ItemStack stack = animatable.getRenderingStack();
+
+        if (stack == null || !stack.getOrCreateTag().getBoolean("IsAnimating")) {
             return ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/none.geo.json");
         }
-        ItemStack stack = animatable.getRenderingStack();
-        if (stack != null && stack.hasTag() && stack.getOrCreateTag().getBoolean(Mode)) {
-            return ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/dawnmaker2.geo.json");
-        }
+
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/dawnmaker.geo.json");
     }
 
-
     @Override
     public ResourceLocation getTextureResource(ItemDawnmaker animatable) {
-        if (this.hidden) {
-            return ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/item/none.png");
-        }
         ItemStack stack = animatable.getRenderingStack();
-        if (stack != null && stack.hasTag() && stack.getOrCreateTag().getBoolean(Mode)) {
-            return ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/item/dawnmaker2.png");
+
+        if (stack != null && stack.getOrCreateTag().getBoolean("IsAnimating")) {
+            var player = net.minecraft.client.Minecraft.getInstance().player;
+            if (player != null) return player.getSkinTextureLocation();
         }
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/item/dawnmaker.png");
+        return stack.getOrCreateTag().getBoolean(Mode) ?
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/item/dawnmaker2.png") :
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/item/dawnmaker.png");
     }
 
     @Override

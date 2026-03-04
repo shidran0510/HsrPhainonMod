@@ -42,7 +42,7 @@ public class LogicDawnmaker {
         tag.putDouble("LockY", player.getY());
         tag.putDouble("LockZ", player.getZ());
 
-        player.teleportTo(tag.getDouble("LockX"),tag.getDouble("LockY"),tag.getDouble("LockZ"));
+        player.teleportTo(tag.getDouble("LockX"), tag.getDouble("LockY"), tag.getDouble("LockZ"));
         player.setDeltaMovement(Vec3.ZERO);
         player.setNoGravity(true);
         player.setInvulnerable(true);
@@ -56,14 +56,17 @@ public class LogicDawnmaker {
     }
 
     public enum Action {
-        None((player, stack) -> {}),
+        None((player, stack) -> {
+        }),
 
         BasicAttack2((player, stack) -> LogicDawnmaker.LogicBasicATK(player, 2)),
 
         LastAttack((player, stack) -> world(player).explode(player, player.getX(), player.getY(), player.getZ(),
                 getLastAttackDamage(), false, getExplosionType())),
 
-        TransFormEffect((player, stack) -> EffectRenderer.startTransformationEffect());
+        TransFormEffect((player, stack) -> EffectRenderer.startTransformationEffect()),
+
+        Skill(((player, stack) -> LogicDawnmaker.LogicSkill(player)));
 
         private final java.util.function.BiConsumer<Player, ItemStack> action;
 
@@ -100,7 +103,9 @@ public class LogicDawnmaker {
 
         if (tag.contains(ModelTimer)) {
             int modelTimer = tag.getInt(ModelTimer);
-            if (!tag.getBoolean(ShowDawnmaker)) { tag.putInt(CustomModelData, 2); }
+            if (!tag.getBoolean(ShowDawnmaker)) {
+                tag.putInt(CustomModelData, 2);
+            }
 
             if (modelTimer > 0) {
                 tag.putInt(ModelTimer, modelTimer - 1);
@@ -110,7 +115,7 @@ public class LogicDawnmaker {
                 } else {
                     tag.putInt(CustomModelData, 0);
                 }
-                tag.putBoolean(ShowDawnmaker,false);
+                tag.putBoolean(ShowDawnmaker, false);
                 tag.remove(ModelTimer);
             }
         }
@@ -125,7 +130,9 @@ public class LogicDawnmaker {
                 try {
                     Action action = Action.valueOf(actionName);
                     action.execute(player, stack);
-                } catch (IllegalArgumentException e) { return; }
+                } catch (IllegalArgumentException e) {
+                    return;
+                }
 
                 tag.remove(DelayTimer);
                 tag.remove(ActionName);
@@ -167,7 +174,6 @@ public class LogicDawnmaker {
         for (int i = 0; i < getSkill2MeteorAmount(); i++) {
             Skill2Entity meteor = new Skill2Entity(EntityRegistry.SKILL2_ENTITY.get(), world);
 
-
             double randomSide = (world.random.nextDouble() - 0.5) * getSkill2MeteorHorizontalRange();
             double randomForward = (world.random.nextDouble() - 0.5) * getSkill2MeteorHorizontalRange();
 
@@ -197,7 +203,7 @@ public class LogicDawnmaker {
 
     }
 
-    public static void LogicBasicATK(Player player,int combo) {
+    public static void LogicBasicATK(Player player, int combo) {
         int range = 1;
         Level world = player.level();
         if (combo == 1) {
@@ -246,5 +252,44 @@ public class LogicDawnmaker {
                         }
                     });
         }
+    }
+
+    public static void LogicSkill(Player player) {
+        Level world = player.level();
+        Vec3 pos = player.position();
+
+        float yRot = player.getYRot();
+        float f = yRot * ((float) Math.PI / 180F);
+        double dx = -net.minecraft.util.Mth.sin(f);
+        double dz = net.minecraft.util.Mth.cos(f);
+        Vec3 horizontalLook = new Vec3(dx, 0, dz).normalize();
+
+        Vec3 rightVec = new Vec3(-dz, 0, dx).normalize();
+
+        Vec3 boxCenter = pos.add(horizontalLook.scale(1.0)).add(0, 1.0, 0);
+
+        double sideWidth = 1.5;
+        net.minecraft.world.phys.AABB hitBox = new net.minecraft.world.phys.AABB(
+                boxCenter.x - sideWidth, boxCenter.y - 1.0, boxCenter.z - sideWidth,
+                boxCenter.x + sideWidth, boxCenter.y + 1.0, boxCenter.z + sideWidth
+        );
+        world.getEntities(player, hitBox, entity -> entity instanceof net.minecraft.world.entity.LivingEntity)
+                .forEach(entity -> {
+                    if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
+
+                        Vec3 toTarget = livingEntity.position().subtract(pos);
+                        Vec3 toTargetHorizontal = new Vec3(toTarget.x, 0, toTarget.z).normalize();
+
+                        double dotProduct = horizontalLook.dot(toTargetHorizontal);
+                        if (dotProduct > Math.cos(Math.toRadians(60.0))) {
+
+                            livingEntity.hurt(player.damageSources().playerAttack(player), getBasicATKDamage());
+
+                            double strength = 0.6;
+                            Vec3 knockbackDir = horizontalLook.add(rightVec.scale(0.8)).normalize();
+                            livingEntity.setDeltaMovement(knockbackDir.scale(strength));
+                        }
+                    }
+                });
     }
 }

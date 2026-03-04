@@ -18,9 +18,10 @@
   "message.hsrphainon.details_title": "§fCharacter Details",
   "message.hsrphainon.description": "Aedes Elysiae, a remote frontier village isolated from the world, now lives on only in cryptic legends.\nThe Nameless hero, %s, the Chrysos Heir carrying the Coreflame of \"Worldbearing,\" memorizes the ideals of the entire world, carries the fate of millions, and brings the first light of dawn to the new world\n\n— \"But should dawn have never existed, let the fires of rage burn this body to ashes and transform into the blazing sun of tomorrow!",
 
-  "skill.hsrphainon.ultimate.start": "He Who Bears the World Must Burn",
-  "skill.hsrphainon.ultimate.end": "%s enters the cycle once more...",
+  "skill.hsrphainon.basic_atk.name": "Creation: Bloodthorn Ferry",
+  "skill.hsrphainon.skill.name":"Let, There Be Light",
   "skill.hsrphainon.skill1.name": "Calamity: Soulscorch Edict",
   "skill.hsrphainon.skill2.name": "Foundation: Stardeath Verdict",
-  "skill.hsrphainon.basic_atk.name": "Creation: Bloodthorn Ferry"
+  "skill.hsrphainon.ultimate.start": "He Who Bears the World Must Burn",
+  "skill.hsrphainon.ultimate.end": "%s enters the cycle once more..."
 }

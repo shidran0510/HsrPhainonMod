@@ -25,7 +25,7 @@ public class HsrPhainonConstants {
     public static final String CustomModelData = "CustomModelData";
     public static final String Mode = "mode";
     public static final String ShowDawnmaker = "showDawnmaker";
-    public static final String[] animID = {"transform", "skill1", "skill2", "lastattack", "basicattack"};
+    public static final String[] animID = {"transform","skill1", "skill2","lastattack","basicattack","skill"};
 //共通変数定義
     public static Level world(Player player) { return player.level(); }
     public static CompoundTag tag(Player player) { return player.getMainHandItem().getOrCreateTag(); }

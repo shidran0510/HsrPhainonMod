@@ -22,28 +22,35 @@ public class SoundsRegistry {
             SOUND_EVENTS.register(
                     "skill1",
                     () -> SoundEvent.createVariableRangeEvent(
-                            ResourceLocation.fromNamespaceAndPath("hsrphainon","skill1")
+                            ResourceLocation.fromNamespaceAndPath(MOD_ID,"skill1")
                     )
             );
     public static final RegistryObject<SoundEvent> Skill2SE =
             SOUND_EVENTS.register(
                     "skill2",
                     () -> SoundEvent.createVariableRangeEvent(
-                            ResourceLocation.fromNamespaceAndPath("hsrphainon","skill2")
+                            ResourceLocation.fromNamespaceAndPath(MOD_ID,"skill2")
                     )
             );
     public static final RegistryObject<SoundEvent> LastAttackSE =
             SOUND_EVENTS.register(
                     "lastattack",
                     () -> SoundEvent.createVariableRangeEvent(
-                            ResourceLocation.fromNamespaceAndPath("hsrphainon","lastattack")
+                            ResourceLocation.fromNamespaceAndPath(MOD_ID,"lastattack")
                     )
             );
     public static final RegistryObject<SoundEvent> BasicAttackSE =
             SOUND_EVENTS.register(
                     "basicattack",
                     () -> SoundEvent.createVariableRangeEvent(
-                            ResourceLocation.fromNamespaceAndPath("hsrphainon","basicattack")
+                            ResourceLocation.fromNamespaceAndPath(MOD_ID,"basicattack")
+                    )
+            );
+    public static final RegistryObject<SoundEvent> SkillSE =
+            SOUND_EVENTS.register(
+                    "skill",
+                    () -> SoundEvent.createVariableRangeEvent(
+                            ResourceLocation.fromNamespaceAndPath(MOD_ID,"skill")
                     )
             );
 }

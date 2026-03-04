@@ -28,13 +28,8 @@ public class DawnmakerRenderer extends GeoItemRenderer<ItemDawnmaker> {
 
         if (!isAnimating) {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-
-            String modelName = tag.getBoolean(com.shidran.hsrphainon.common.HsrPhainonConstants.Mode) ? "dawnmaker2" : "dawnmaker";
-            net.minecraft.resources.ResourceLocation vanillaModelLocation =
-                    net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("hsrphainon", "item/" + modelName);
-
             net.minecraft.client.resources.model.BakedModel bakedModel =
-                    mc.getModelManager().getModel(new net.minecraft.client.resources.model.ModelResourceLocation(vanillaModelLocation, "inventory"));
+                    mc.getItemRenderer().getModel(stack, null, null, 0);
 
             poseStack.pushPose();
             mc.getItemRenderer().render(stack, transformType, false, poseStack, bufferSource, packedLight, packedOverlay, bakedModel);
@@ -42,6 +37,7 @@ public class DawnmakerRenderer extends GeoItemRenderer<ItemDawnmaker> {
             return;
         }
 
+        this.animatable.setRenderingStack(stack);
         super.renderByItem(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay);
     }
 }

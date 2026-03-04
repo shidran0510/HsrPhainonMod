@@ -6,6 +6,13 @@
     ]
 },
 
+  "skill": {
+    "category": "player",
+    "sounds": [
+      "hsrphainon:skill"
+    ]
+  },
+
   "skill1": {
     "category": "player",
     "sounds": [
