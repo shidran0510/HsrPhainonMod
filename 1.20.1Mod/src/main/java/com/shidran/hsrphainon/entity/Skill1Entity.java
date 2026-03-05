@@ -98,15 +98,14 @@ public class Skill1Entity extends Entity implements GeoEntity {
 
             if (owner != null) {
 
-                net.minecraft.world.item.ItemStack stack = owner.getMainHandItem();
+                CompoundTag playerTag = owner.getPersistentData();
 
-                if (stack.getItem() instanceof com.shidran.hsrphainon.item.ItemDawnmaker) {
-                    int lockTimer = stack.getOrCreateTag().getInt(LockTimer);
-                    if (lockTimer <= 0) {
+                if (playerTag.contains(LockTimer)) {
+                    if (playerTag.getInt(LockTimer) <= 0) {
                         this.discard();
                     }
-                }
-            } else if (this.tickCount > 200) {
+                } else{this.discard();}
+            }else if (this.tickCount > 200) {
                 this.discard();
             }
         }

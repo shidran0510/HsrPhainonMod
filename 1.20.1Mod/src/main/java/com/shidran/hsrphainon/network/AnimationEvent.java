@@ -21,8 +21,19 @@ public class AnimationEvent {
 
         if (player instanceof AbstractClientPlayer clientPlayer) {
             var data = PlayerAnimationAccess.getPlayerAssociatedData(clientPlayer);
-            var layer = data.get(ResourceLocation.fromNamespaceAndPath(MOD_ID, animationId));
 
+            if ("stop".equals(animationId)) {
+                for (String id : com.shidran.hsrphainon.common.HsrPhainonConstants.animID) {
+                    var layer = data.get(ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+                    if (layer instanceof ModifierLayer<?> modifierLayer) {
+                        modifierLayer.setAnimation(null);
+                    }
+                }
+                Minecraft.getInstance().getSoundManager().stop(null, net.minecraft.sounds.SoundSource.PLAYERS);
+                return;
+            }
+
+            var layer = data.get(ResourceLocation.fromNamespaceAndPath(MOD_ID, animationId));
             if (layer instanceof ModifierLayer<?> modifierLayer) {
                 var anim = PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath(MOD_ID, animationId));
 

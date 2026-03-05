@@ -45,70 +45,77 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
         super(tier, attackDamage, attackSpeed, properties);
     }
 
-    private boolean getMode(ItemStack stack) {
-        if (stack == null || !stack.hasTag()) return false;
-        CompoundTag tag = tag(stack);
-        return tag.getBoolean(Mode);
-    }
-
     public void inventoryTick(@NotNull ItemStack stack, @Nonnull Level world, @Nonnull Entity entity, int slot, boolean isSelected) {
-        CompoundTag tag = tag(stack);
+        if (!world.isClientSide && entity instanceof Player player) {
+            CompoundTag playerTag = tagPlayerData(player);
+            CompoundTag itemTag = tagItemStack(stack);
 
-        LogicDawnmaker.RunTimer(stack, world, entity);
+            if (!itemTag.contains(ModelTimer)) {
+                if (itemTag.getInt(CustomModelData) == 2) {
+                    if (itemTag.getBoolean(Mode)) {
+                        itemTag.putInt(CustomModelData, 1);
+                    } else {
+                        itemTag.putInt(CustomModelData, 0);
+                    }
+                }
+            }
+        }
     }
 
     public void Ultimate(ItemStack stack, Player player) {
         if (player.getCooldowns().isOnCooldown(this)) return;
-        CompoundTag tag = tag(player);
         Level world = world(player);
+        CompoundTag itemTag = tagMainHand(player);
+        CompoundTag playerTag = tagPlayerData(player);
 
         if (!world.isClientSide) {
-            boolean newMode = !tag.getBoolean(Mode);
-            tag.putBoolean(Mode, newMode);
-
+            boolean newMode = !itemTag.getBoolean(Mode);
+            itemTag.putBoolean(Mode, newMode);
 
             int LockTick = newMode ? 130 : 100;
 
-            if (tag.getBoolean(Mode)) {
+            if (itemTag.getBoolean(Mode)) {
                 LogicDawnmaker.EffectSkill(
                         player,
                         "skill.hsrphainon.ultimate.start",
                         SoundsRegistry.UltimateSE.get(),
                         "transform",
-                        160, 28, true
+                        160, 28
 
                 );
-                Delay(stack, 12, TransFormEffect);
+                Delay(player, 12, TransFormEffect);
             } else {
                 LogicDawnmaker.EffectSkill(
                         player,
                         "skill.hsrphainon.ultimate.end",
                         SoundsRegistry.LastAttackSE.get(),
                         "lastattack",
-                        240, 100, false
+                        240, 100
                 );
-                Delay(stack, 80, LastAttack);
+                itemTag.putInt(CustomModelData, 2);
+                Delay(player, 80, LastAttack);
             }
-            tag.putInt(LockTimer, LockTick);
+            playerTag.putInt(LockTimer, LockTick);
         }
     }
 
     public void Skill1(ItemStack stack, Player player) {
         if (player.getCooldowns().isOnCooldown(this)) return;
         Level world = world(player);
-        CompoundTag tag = tag(player);
+        CompoundTag itemTag = tagMainHand(player);
+        CompoundTag playerTag = tagPlayerData(player);
 
         if (!world.isClientSide) {
-            if (tag.getBoolean(Mode)) {
+            if (itemTag.getBoolean(Mode)) {
 
                 LogicDawnmaker.EffectSkill(
                         player,
                         "skill.hsrphainon.skill1.name",
                         SoundsRegistry.Skill1SE.get(),
                         "skill1",
-                        120, 100, false
+                        120, 90
                 );
-
+                itemTag.putInt(CustomModelData, 2);
                 LogicDawnmaker.LogicSkill1(player);
             } else {
                 LogicDawnmaker.EffectSkill(
@@ -116,53 +123,58 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
                         "skill.hsrphainon.skill.name",
                         SoundsRegistry.SkillSE.get(),
                         "skill",
-                        120, 17, true
+                        60, 17
                 );
-                Delay(stack, 40, Skill);
-                tag.putInt(CustomModelData,3);
-                tag.putInt(LockTimer, 50);
+                Delay(player, 40, Skill);
+                itemTag.putInt(CustomModelData,3);
+                playerTag.putInt(LockTimer, 50);
             }
         }
     }
 
     public void Skill2(ItemStack stack, Player player) {
-        if (!getMode(stack) || player.getCooldowns().isOnCooldown(this)) return;
+        if (player.getCooldowns().isOnCooldown(this)) return;
         Level world = world(player);
+        CompoundTag itemTag = tagMainHand(player);
 
         if (!world.isClientSide) {
-
-            LogicDawnmaker.EffectSkill(
-                    player,
-                    "skill.hsrphainon.skill2.name",
-                    SoundsRegistry.Skill2SE.get(),
-                    "skill2",
-                    120, 100, false
-            );
-
-            LogicDawnmaker.LogicSkill2(player);
+            if (itemTag.getBoolean(Mode)) {
+                LogicDawnmaker.EffectSkill(
+                        player,
+                        "skill.hsrphainon.skill2.name",
+                        SoundsRegistry.Skill2SE.get(),
+                        "skill2",
+                        120, 80
+                );
+                itemTag.putInt(CustomModelData, 2);
+                LogicDawnmaker.LogicSkill2(player);
+            }
         }
     }
 
     public void BasicATK(ItemStack stack, Player player) {
-        if (!getMode(stack) || player.getCooldowns().isOnCooldown(this)) return;
+        if (player.getCooldowns().isOnCooldown(this)) return;
         Level world = world(player);
+        CompoundTag itemTag = tagMainHand(player);
 
         if (!world.isClientSide) {
-            LogicDawnmaker.EffectSkill(
-                    player,
-                    "skill.hsrphainon.basic_atk.name",
-                    SoundsRegistry.BasicAttackSE.get(),
-                    "basicattack",
-                    60, 60, true
-            );
-            LogicDawnmaker.LogicBasicATK(player, 1);
-            LogicDawnmaker.Action.Delay(stack, 40, BasicAttack2);
+            if (itemTag.getBoolean(Mode)) {
+                LogicDawnmaker.EffectSkill(
+                        player,
+                        "skill.hsrphainon.basic_atk.name",
+                        SoundsRegistry.BasicAttackSE.get(),
+                        "basicattack",
+                        60, 60
+                );
+                LogicDawnmaker.LogicBasicATK(player, 1);
+                Delay(player, 40, BasicAttack2);
+            }
         }
     }
 
     @Override
     public void appendHoverText(@Nonnull ItemStack stack, Level world, @Nonnull List<Component> list, @Nonnull TooltipFlag flag) {
-        CompoundTag tag = tag(stack);
+        CompoundTag tag = tagItemStack(stack);
 
         String modeKey = (stack.hasTag() && tag.getBoolean(Mode)) ?
                 "message.hsrphainon.mode_change.khaslana" : "message.hsrphainon.mode_change.phainon";
@@ -191,7 +203,7 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         if (slot == EquipmentSlot.MAINHAND) {
-            return tag(stack).getBoolean(Mode) ?
+            return tagItemStack(stack).getBoolean(Mode) ?
                     HsrPhainonConstants.getKhaslanaModifiers() :
                     HsrPhainonConstants.getPhainonModifiers();
         }
@@ -206,15 +218,23 @@ public class ItemDawnmaker extends SwordItem implements GeoItem {
     public boolean isEnchantable(@Nonnull ItemStack stack) {
         return true;
     }
-    @Override //アイテム破壊無効
-    public boolean onEntityItemUpdate(ItemStack stack, net.minecraft.world.entity.item.ItemEntity entity) {
-        entity.setInvulnerable(true);return false;
-    }
     @Override //火炎耐性
     public boolean isFireResistant() {
         return true;
     }
+    @Override
+    public boolean onEntityItemUpdate(ItemStack stack, net.minecraft.world.entity.item.ItemEntity entity) {
+        entity.setInvulnerable(true);
 
+        CompoundTag itemTag = stack.getTag();
+        if (itemTag != null && itemTag.getInt(CustomModelData) == 2) {
+            itemTag.remove(ModelTimer);
+            itemTag.putInt(CustomModelData, itemTag.getBoolean(Mode) ? 1 : 0);
+        }
+        return false;
+    }
+
+//Geckolib
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, event ->

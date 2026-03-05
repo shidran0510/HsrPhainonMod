@@ -48,6 +48,7 @@ public class ExecutePacket {
                             dawnmaker.Ultimate(stack, player);
                             break;
                         default:
+                            break;
             }
         }
         context.setPacketHandled(true);

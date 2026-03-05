@@ -13,6 +13,7 @@ import net.minecraft.world.level.Level;
 
 import static com.shidran.hsrphainon.item.ItemDawnmaker.BaseAttackDmageUUID;
 import static com.shidran.hsrphainon.item.ItemDawnmaker.BaseAttackSpeedUUID;
+import static com.shidran.hsrphainon.common.HsrPhainonConfig.*;
 
 //import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 public class HsrPhainonConstants {
@@ -24,14 +25,15 @@ public class HsrPhainonConstants {
     public static final String ActionName = "ActionName";
     public static final String CustomModelData = "CustomModelData";
     public static final String Mode = "mode";
-    public static final String ShowDawnmaker = "showDawnmaker";
     public static final String[] animID = {"transform","skill1", "skill2","lastattack","basicattack","skill"};
+    public static final String[] soundID = {"basicattack","skill", "skill1", "skill2","ultimate","lastattack"};
 //共通変数定義
     public static Level world(Player player) { return player.level(); }
-    public static CompoundTag tag(Player player) { return player.getMainHandItem().getOrCreateTag(); }
-    public static CompoundTag tag(ItemStack stack) {return stack.getOrCreateTag();}
     public static ItemStack stack(Player player) {return player.getMainHandItem();}
     public static Item item(Player player) {return player.getMainHandItem().getItem();}
+    public static CompoundTag tagMainHand(Player player) { return player.getMainHandItem().getOrCreateTag(); }
+    public static CompoundTag tagPlayerData(Player player) { return player.getPersistentData(); }
+    public static CompoundTag tagItemStack(ItemStack stack) {return stack.getOrCreateTag();}
 
 //キー番号
     public static final int BasicATK = 0;
@@ -39,15 +41,16 @@ public class HsrPhainonConstants {
     public static final int Skill2 = 2;
     public static final int Ultimate = 3;
 //スキルダメージ
-    public static float getBasicATKDamage() { return HsrPhainonConfig.BasicATKDamage.get().floatValue(); }
-    public static float getSkill1Damage() { return HsrPhainonConfig.Skill1Damage.get().floatValue(); }
-    public static float getSkill2DamageSmall() { return HsrPhainonConfig.Skill2DamageSmall.get().floatValue(); }
-    public static float getSkill2DamageLarge() { return HsrPhainonConfig.Skill2DamageLarge.get().floatValue(); }
-    public static int getSkill2MeteorAmount() { return HsrPhainonConfig.Skill2MeteorAmount.get(); }
-    public static float getSkill2MeteorHorizontalRange() { return HsrPhainonConfig.Skill2MeteorHorizontalRange.get().floatValue(); }
-    public static float getSkill2MeteorVerticalRange() { return HsrPhainonConfig.Skill2MeteorVerticalRange.get().floatValue(); }
-    public static float getLastAttackDamage() { return HsrPhainonConfig.LastAttackDamage.get().floatValue(); }
-    public static Level.ExplosionInteraction getExplosionType() {return HsrPhainonConfig.ExplosionType.get();}
+    public static float getBasicATKDamage() { return BasicATKDamage.get().floatValue(); }
+    public static float getSkillDamage() {return SkillDamage.get().floatValue(); }
+    public static float getSkill1Damage() { return Skill1Damage.get().floatValue(); }
+    public static float getSkill2DamageSmall() { return Skill2DamageSmall.get().floatValue(); }
+    public static float getSkill2DamageLarge() { return Skill2DamageLarge.get().floatValue(); }
+    public static int getSkill2MeteorAmount() { return Skill2MeteorAmount.get(); }
+    public static float getSkill2MeteorHorizontalRange() { return Skill2MeteorHorizontalRange.get().floatValue(); }
+    public static float getSkill2MeteorVerticalRange() { return Skill2MeteorVerticalRange.get().floatValue(); }
+    public static float getLastAttackDamage() { return LastAttackDamage.get().floatValue(); }
+    public static Level.ExplosionInteraction getExplosionType() {return ExplosionType.get();}
 // 武器属性 (AttributeModifier)
     public static Multimap<Attribute, AttributeModifier> PhainonDamage;
     public static Multimap<Attribute, AttributeModifier> KhaslanaDamage;

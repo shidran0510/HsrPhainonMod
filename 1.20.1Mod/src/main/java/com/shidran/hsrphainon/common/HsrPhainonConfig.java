@@ -10,6 +10,7 @@ public class HsrPhainonConfig {
     public static final ForgeConfigSpec.DoubleValue PhainonDamage;
     public static final ForgeConfigSpec.DoubleValue KhaslanaDamage;
     public static final ForgeConfigSpec.DoubleValue BasicATKDamage;
+    public static final ForgeConfigSpec.DoubleValue SkillDamage;
     public static final ForgeConfigSpec.DoubleValue Skill1Damage;
     public static final  ForgeConfigSpec.IntValue Skill2MeteorAmount;
     public static final ForgeConfigSpec.DoubleValue Skill2MeteorHorizontalRange;
@@ -30,6 +31,9 @@ public class HsrPhainonConfig {
         BasicATKDamage = BUILDER
                 .comment("Basic ATK - Damage")
                 .defineInRange("BasicATKDamage", 30.0, 0.0, 33550336.0);
+        SkillDamage = BUILDER
+                .comment("Skill - Damage")
+                .defineInRange("SkillDamage", 16.0, 0.0, 33550336.0);
         Skill1Damage = BUILDER
                 .comment("Skill1 - Damage")
                 .defineInRange("Skill1Damage", 50.0, 0.0, 33550336.0);

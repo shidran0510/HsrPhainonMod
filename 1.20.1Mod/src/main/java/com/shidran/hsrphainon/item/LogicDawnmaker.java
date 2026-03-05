@@ -4,13 +4,13 @@ import com.shidran.hsrphainon.client.renderer.EffectRenderer;
 import com.shidran.hsrphainon.entity.Skill1Entity;
 import com.shidran.hsrphainon.entity.Skill2Entity;
 import com.shidran.hsrphainon.network.AnimationPacket;
+import com.shidran.hsrphainon.network.LockTimerPacket;
 import com.shidran.hsrphainon.registry.EntityRegistry;
 import com.shidran.hsrphainon.registry.PacketRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,9 +20,10 @@ import net.minecraft.world.phys.Vec3;
 import static com.shidran.hsrphainon.common.HsrPhainonConstants.*;
 
 public class LogicDawnmaker {
-    public static void EffectSkill(Player player, String message, SoundEvent sound, String animation, int cooldown, int tick, boolean show) {
+    public static void EffectSkill(Player player, String message, SoundEvent sound, String animation, int cooldown, int tick) {
         Level world = world(player);
-        CompoundTag tag = tag(player);
+        CompoundTag playerTag = tagPlayerData(player);
+        CompoundTag itemTag = tagMainHand(player);
         Item item = item(player);
         Object PlayerName = player.getName().getString();
 
@@ -31,18 +32,18 @@ public class LogicDawnmaker {
         PacketRegistry.sendToAllClients(new AnimationPacket(player.getUUID(), animation));
         player.getCooldowns().addCooldown(item, cooldown);
         player.fallDistance = 0;
-        tag.putBoolean(ShowDawnmaker, show);
-        tag.putInt(ModelTimer, tick);
-        tag.putInt(LockTimer, tick);
+        itemTag.putInt(ModelTimer, tick);
+        playerTag.putInt(LockTimer, tick);
     }
 
     public static void RunPlayerLock(Player player) {
-        CompoundTag tag = tag(player);
-        tag.putDouble("LockX", player.getX());
-        tag.putDouble("LockY", player.getY());
-        tag.putDouble("LockZ", player.getZ());
+        CompoundTag playerTag = tagPlayerData(player);
 
-        player.teleportTo(tag.getDouble("LockX"), tag.getDouble("LockY"), tag.getDouble("LockZ"));
+        playerTag.putDouble("LockX", player.getX());
+        playerTag.putDouble("LockY", player.getY());
+        playerTag.putDouble("LockZ", player.getZ());
+
+        player.teleportTo(playerTag.getDouble("LockX"), playerTag.getDouble("LockY"), playerTag.getDouble("LockZ"));
         player.setDeltaMovement(Vec3.ZERO);
         player.setNoGravity(true);
         player.setInvulnerable(true);
@@ -78,70 +79,73 @@ public class LogicDawnmaker {
             this.action.accept(player, stack);
         }
 
-        public static void Delay(ItemStack stack, int ticks, Action action) {
-            CompoundTag tag = tag(stack);
+        public static void Delay(Player player, int ticks, Action action) {
+            CompoundTag tag = tagPlayerData(player);
             tag.putInt(DelayTimer, ticks);
             tag.putString(ActionName, action.name());
         }
     }
 
-    public static void RunTimer(ItemStack stack, Level world, Entity entity) {
-        if (world.isClientSide || !(entity instanceof Player player)) return;
-        CompoundTag tag = tag(stack);
+    public static void RunTimer(Player player) {
+        CompoundTag playerTag = tagPlayerData(player);
+        CompoundTag itemTag = tagMainHand(player);
 
-        if (tag.contains(LockTimer)) {
-            int lockTimer = tag.getInt(LockTimer);
+        if (playerTag.contains(LockTimer)) {
+            int lockTimer = playerTag.getInt(LockTimer);
+            int nextTick = Math.max(0, lockTimer - 1);
 
             if (lockTimer > 0) {
                 LogicDawnmaker.RunPlayerLock(player);
-                tag.putInt(LockTimer, lockTimer - 1);
+                playerTag.putInt(LockTimer, nextTick);
             } else {
                 LogicDawnmaker.StopPlayerLock(player);
-                tag.remove(LockTimer);
+                if (!player.level().isClientSide && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    PacketRegistry.sendToPlayer(new LockTimerPacket(0), serverPlayer);
+                }
+                playerTag.remove(LockTimer);
+            }
+            if (!player.level().isClientSide && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                PacketRegistry.sendToPlayer(new LockTimerPacket(nextTick), serverPlayer);
             }
         }
 
-        if (tag.contains(ModelTimer)) {
-            int modelTimer = tag.getInt(ModelTimer);
-            if (!tag.getBoolean(ShowDawnmaker)) {
-                tag.putInt(CustomModelData, 2);
-            }
+        if (itemTag.contains(ModelTimer)) {
+            int modelTimer = itemTag.getInt(ModelTimer);
 
             if (modelTimer > 0) {
-                tag.putInt(ModelTimer, modelTimer - 1);
+                itemTag.putInt(ModelTimer, modelTimer - 1);
             } else {
-                if (tag.getBoolean(Mode)) {
-                    tag.putInt(CustomModelData, 1);
+                if (itemTag.getBoolean(Mode)) {
+                    itemTag.putInt(CustomModelData, 1);
                 } else {
-                    tag.putInt(CustomModelData, 0);
+                    itemTag.putInt(CustomModelData, 0);
                 }
-                tag.putBoolean(ShowDawnmaker, false);
-                tag.remove(ModelTimer);
+                itemTag.remove(ModelTimer);
             }
         }
 
-        if (tag.contains(DelayTimer)) {
-            int delayTimer = tag.getInt(DelayTimer);
+        if (playerTag.contains(DelayTimer)) {
+            int delayTimer = playerTag.getInt(DelayTimer);
 
             if (delayTimer > 0) {
-                tag.putInt(DelayTimer, delayTimer - 1);
+                playerTag.putInt(DelayTimer, delayTimer - 1);
             } else {
-                String actionName = tag.getString(ActionName);
+                String actionName = playerTag.getString(ActionName);
                 try {
                     Action action = Action.valueOf(actionName);
-                    action.execute(player, stack);
+                    action.execute(player, player.getMainHandItem());
                 } catch (IllegalArgumentException e) {
                     return;
                 }
 
-                tag.remove(DelayTimer);
-                tag.remove(ActionName);
+                playerTag.remove(DelayTimer);
+                playerTag.remove(ActionName);
             }
         }
     }
 
     public static void LogicSkill1(Player player) {
-        Level world = player.level();
+        Level world = world(player);
 
         float yRot = player.getYRot();
         float f = yRot * ((float) Math.PI / 180F);
@@ -162,7 +166,7 @@ public class LogicDawnmaker {
     }
 
     public static void LogicSkill2(Player player) {
-        Level world = player.level();
+        Level world = world(player);
         float yRot = player.getYRot();
         float f = yRot * ((float) Math.PI / 180F);
         double dx = -net.minecraft.util.Mth.sin(f);
@@ -205,7 +209,7 @@ public class LogicDawnmaker {
 
     public static void LogicBasicATK(Player player, int combo) {
         int range = 1;
-        Level world = player.level();
+        Level world = world(player);
         if (combo == 1) {
 
             Vec3 lookVec = player.getLookAngle();
@@ -255,7 +259,7 @@ public class LogicDawnmaker {
     }
 
     public static void LogicSkill(Player player) {
-        Level world = player.level();
+        Level world = world(player);
         Vec3 pos = player.position();
 
         float yRot = player.getYRot();
@@ -283,7 +287,7 @@ public class LogicDawnmaker {
                         double dotProduct = horizontalLook.dot(toTargetHorizontal);
                         if (dotProduct > Math.cos(Math.toRadians(60.0))) {
 
-                            livingEntity.hurt(player.damageSources().playerAttack(player), getBasicATKDamage());
+                            livingEntity.hurt(player.damageSources().playerAttack(player), getSkillDamage());
 
                             double strength = 0.6;
                             Vec3 knockbackDir = horizontalLook.add(rightVec.scale(0.8)).normalize();
@@ -292,4 +296,5 @@ public class LogicDawnmaker {
                     }
                 });
     }
+
 }
